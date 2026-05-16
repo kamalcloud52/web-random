@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitive Definition
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 1. Users Collection
+    match /users/{userId} {
+      function isValidUser(data) {
+        return data.keys().hasAll(['name', 'role']) &&
+               data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+               data.role in ['user', 'worker'] &&
+               (data.get('photo', '') is string) &&
+               (data.get('location', '') is string);
+      }
+
+      allow get: if true;
+      allow list: if true;
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['name', 'photo', 'location', 'role']);
+    }
+
+    // 2. Workers Collection
+    match /workers/{workerId} {
+      function isValidWorker(data) {
+        return data.keys().hasAll(['category', 'description', 'whatsapp']) &&
+               data.category is string && data.category.size() > 0 &&
+               data.description is string && data.description.size() > 0 &&
+               data.whatsapp is string && data.whatsapp.size() > 0 &&
+               (data.get('categories', []) is list) &&
+               (data.get('verified', false) is bool) &&
+               (data.get('rating', 0) is number) &&
+               (data.get('activeStatus', '') is string) &&
+               (data.get('workArea', '') is string);
+      }
+
+      allow get: if true;
+      allow list: if true;
+      allow create: if isOwner(workerId) && isValidWorker(incoming());
+      allow update: if isOwner(workerId) && isValidWorker(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['category', 'categories', 'description', 'whatsapp', 'activeStatus', 'workArea']);
+    }
+
+    // 3. Portfolios Collection
+    match /portfolios/{portfolioId} {
+      function isValidPortfolio(data) {
+        return data.keys().hasAll(['workerId', 'image', 'createdAt']) &&
+               data.workerId is string && data.workerId.size() > 0 &&
+               data.image is string && data.image.size() > 0 &&
+               data.createdAt is timestamp &&
+               (data.get('caption', '') is string);
+      }
+
+      allow read: if true;
+      allow create: if isSignedIn() && isOwner(incoming().workerId) && isValidPortfolio(incoming());
+      allow delete: if isSignedIn() && isOwner(existing().workerId);
+    }
+
+    // 4. Reviews Collection
+    match /reviews/{reviewId} {
+      function isValidReview(data) {
+        return data.keys().hasAll(['workerId', 'username', 'rating']) &&
+               data.workerId is string && data.workerId.size() > 0 &&
+               data.username is string && data.username.size() > 0 &&
+               data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+               (data.get('comment', '') is string);
+      }
+
+      allow read: if true;
+      allow create: if isSignedIn() && isValidReview(incoming());
+    }
+  }
+}
