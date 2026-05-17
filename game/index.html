@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tes Rebahan 😴</title>
+
+  <!-- FONT & LIBRARIES -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Tes Level Rebahan 😴">
+  <meta name="description" content="Cek seberapa parah kadar rebahanmu hari ini. Apakah kamu masih produktif atau sudah jadi Sultan Rebahan?">
+
+  <!-- Open Graph / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://s.id/tes-level-rebahan">
+  <meta property="og:title" content="Tes Level Rebahan 😴">
+  <meta property="og:description" content="Cek level rebahanmu! 🟢 Produktif atau 🔴 Sultan Rebahan?">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/1mz_UdTyZJUbvHSWWS3e33bN-aJrctOCc">
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 1s ease;
+    }
+
+    .app { width: 100%; max-width: 420px; padding: 20px; position: relative; }
+
+    .card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 25px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      min-height: 500px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Welcome Screen */
+    #welcome-screen { text-align: center; animation: fadeIn 0.8s ease; }
+    .hero-img {
+      width: 100%;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    #quiz-ui, #loading, #result { display: none; }
+
+    .progress-container { height: 8px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-bottom: 20px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: #00ffcc; transition: width 0.4s ease; }
+
+    .question-step { display: none; animation: slideIn 0.3s ease-out; }
+    .question-step.active { display: block; }
+    .question-text { font-size: 1.05rem; font-weight: 500; margin-bottom: 12px; display: block; line-height: 1.4; }
+
+    label {
+      display: block;
+      background: rgba(255,255,255,0.1);
+      padding: 12px 15px;
+      border-radius: 12px;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid transparent;
+      font-size: 0.95rem;
+    }
+    label:hover { background: rgba(255,255,255,0.2); }
+    input:checked + label { background: #00ffcc !important; color: #1a1a1a !important; font-weight: bold; transform: scale(1.02); }
+    input { display: none; }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #00ffcc;
+      color: #1a1a1a;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .pulse-btn { animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 255, 204, 0.7); }
+      70% { box-shadow: 0 0 0 12px rgba(0, 255, 204, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 255, 204, 0); }
+    }
+
+    .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.1); border-top: 5px solid #00ffcc; border-radius: 50%; animation: spin 1s linear infinite; margin: 30px auto; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    /* Footer WM */
+    .footer-wm {
+      text-align: center;
+      font-size: 0.75rem;
+      margin-top: 20px;
+      opacity: 0.6;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+    .footer-wm a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer-wm a:hover {
+      text-decoration: underline;
+      opacity: 1;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; transform: translateX(0); } }
+    .card.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+    @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+
+    .result { text-align: center; }
+    .gelar { display: inline-block; background: gold; color: black; padding: 2px 10px; border-radius: 5px; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <div class="card" id="mainCard">
+    
+    <!-- LANDING PAGE -->
+    <div id="welcome-screen">
+      <img src="https://lh3.googleusercontent.com/d/1mz_UdTyZJUbvHSWWS3e33bN-aJrctOCc" class="hero-img" alt="Tes Rebahan">
+      <h1>Tes Level Rebahan</h1>
+      <p style="opacity: 0.8; margin-bottom: 25px; font-size: 0.9rem;">Seberapa kuat daya tarik kasurmu hari ini?</p>
+      <button class="pulse-btn" onclick="startQuiz()">Mulai Tes 🚀</button>
+      <p style="font-size: 0.7rem; margin-top: 15px; opacity: 0.5;">🔥 1.240+ orang sedang rebahan</p>
+    </div>
+
+    <!-- QUIZ UI -->
+    <div id="quiz-ui">
+      <h1 style="font-size: 1.2rem;">Analisis Level 🛌</h1>
+      <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
+      <form id="quizForm">
+        <div class="question-step active" id="step1">
+          <span class="question-text">1. Bangun jam berapa biasanya?</span>
+          <input type="radio" name="q1" value="1" id="q1a" onchange="handleSelect(2)"><label for="q1a">< 05.00</label>
+          <input type="radio" name="q1" value="2" id="q1b" onchange="handleSelect(2)"><label for="q1b">05.00 – 07.00</label>
+          <input type="radio" name="q1" value="3" id="q1c" onchange="handleSelect(2)"><label for="q1c">07.00 – 09.00</label>
+          <input type="radio" name="q1" value="4" id="q1d" onchange="handleSelect(2)"><label for="q1d">> 09.00</label>
+        </div>
+        <div class="question-step" id="step2">
+          <span class="question-text">2. Rata-rata screen time harian?</span>
+          <input type="radio" name="q2" value="1" id="q2a" onchange="handleSelect(3)"><label for="q2a">< 2 jam</label>
+          <input type="radio" name="q2" value="2" id="q2b" onchange="handleSelect(3)"><label for="q2b">2 – 4 jam</label>
+          <input type="radio" name="q2" value="3" id="q2c" onchange="handleSelect(3)"><label for="q2c">4 – 6 jam</label>
+          <input type="radio" name="q2" value="4" id="q2d" onchange="handleSelect(3)"><label for="q2d">> 6 jam</label>
+        </div>
+        <div class="question-step" id="step3">
+          <span class="question-text">3. Aktivitas utama hari ini?</span>
+          <input type="radio" name="q3" value="1" id="q3a" onchange="handleSelect(4)"><label for="q3a">Produktif Parah</label>
+          <input type="radio" name="q3" value="2" id="q3b" onchange="handleSelect(4)"><label for="q3b">Biasa Saja</label>
+          <input type="radio" name="q3" value="3" id="q3c" onchange="handleSelect(4)"><label for="q3c">Guling-guling</label>
+          <input type="radio" name="q3" value="4" id="q3d" onchange="handleSelect(4)"><label for="q3d">Full Kasur 🗿</label>
+        </div>
+        <div class="question-step" id="step4">
+          <span class="question-text">4. Posisi andalan saat main HP?</span>
+          <input type="radio" name="q4" value="1" id="q4a" onchange="handleSelect(5)"><label for="q4a">Duduk Tegak</label>
+          <input type="radio" name="q4" value="2" id="q4b" onchange="handleSelect(5)"><label for="q4b">Nyender Bantal</label>
+          <input type="radio" name="q4" value="3" id="q4c" onchange="handleSelect(5)"><label for="q4c">Tengkurap</label>
+          <input type="radio" name="q4" value="4" id="q4d" onchange="handleSelect(5)"><label for="q4d">Telentang ampe HP Jatuh ke Muka 😭</label>
+        </div>
+        <div class="question-step" id="step5">
+          <span class="question-text">5. Status mandi hari ini?</span>
+          <input type="radio" name="q5" value="1" id="q5a" onchange="handleSelect(6)"><label for="q5a">Wangi & Segar</label>
+          <input type="radio" name="q5" value="2" id="q5b" onchange="handleSelect(6)"><label for="q5b">Mandi Sekali</label>
+          <input type="radio" name="q5" value="3" id="q5c" onchange="handleSelect(6)"><label for="q5c">Kalau Inget Aja</label>
+          <input type="radio" name="q5" value="4" id="q5d" onchange="handleSelect(6)"><label for="q5d">Cuma Cuci Muka 🗿</label>
+        </div>
+        <div class="question-step" id="step6">
+          <span class="question-text">6. Jarak terjauh hari ini?</span>
+          <input type="radio" name="q6" value="1" id="q6a" onchange="handleSelect(7)"><label for="q6a">Keluar Rumah/Olahraga</label>
+          <input type="radio" name="q6" value="2" id="q6b" onchange="handleSelect(7)"><label for="q6b">Cuma Depan Teras</label>
+          <input type="radio" name="q6" value="3" id="q6c" onchange="handleSelect(7)"><label for="q6c">Dapur - Kamar Mandi</label>
+          <input type="radio" name="q6" value="4" id="q6d" onchange="handleSelect(7)"><label for="q6d">Bantal ke Ujung Kasur 🛌</label>
+        </div>
+        <div class="question-step" id="step7">
+          <span class="question-text">7. Ada notifikasi masuk, responnya?</span>
+          <input type="radio" name="q7" value="1" id="q7a" onchange="handleSelect(8)"><label for="q7a">Langsung Balas</label>
+          <input type="radio" name="q7" value="2" id="q7b" onchange="handleSelect(8)"><label for="q7b">Cek Dikit</label>
+          <input type="radio" name="q7" value="3" id="q7c" onchange="handleSelect(8)"><label for="q7c">Nunggu Mood Stabil</label>
+          <input type="radio" name="q7" value="4" id="q7d" onchange="handleSelect(8)"><label for="q7d">Silent Selamanya 🤐</label>
+        </div>
+        <div class="question-step" id="step8">
+          <span class="question-text">8. Seberapa sering scroll sosmed?</span>
+          <input type="radio" name="q8" value="1" id="q8a" onchange="updateUI(8)"><label for="q8a">Jarang</label>
+          <input type="radio" name="q8" value="2" id="q8b" onchange="updateUI(8)"><label for="q8b">Kadang-kadang</label>
+          <input type="radio" name="q8" value="3" id="q8c" onchange="updateUI(8)"><label for="q8c">Sering Banget</label>
+          <input type="radio" name="q8" value="4" id="q8d" onchange="updateUI(8)"><label for="q8d">Nonstop Ampe Pusing 😭</label>
+          <div class="btn-group"><button type="button" onclick="mulaiAnalisis()">Lihat Hasil Akhir</button></div>
+        </div>
+      </form>
+    </div>
+
+    <!-- LOADING SCREEN -->
+    <div id="loading" style="text-align: center; margin: auto;">
+      <div class="spinner"></div>
+      <p id="loading-text" style="font-style: italic; font-size: 0.9rem;">Menghitung gravitasi kasur...</p>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result" class="result">
+      <div id="result-content"></div>
+      <button onclick="shareResult()" style="background: #25d366; color: white; margin-bottom: 10px;">Bagikan ke WA</button>
+      <button onclick="resetQuiz()" style="background: rgba(255,255,255,0.2); color: white;">Ulangi Tes</button>
+    </div>
+
+  </div>
+
+  <!-- WATERMARK FOOTER -->
+  <div class="footer-wm">Crafted with ☕ by <a href="https://www.instagram.com/kamalamakamalamak?igsh=enI5Yzh5amN6ZmJi" target="_blank">Kamal Fikar</a></div>
+</div>
+
+<audio id="clickSound"><source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg"></audio>
+
+<script>
+  let userLevel = "";
+  const totalSteps = 8;
+  const colors = [
+    "linear-gradient(135deg, #667eea, #764ba2)", 
+    "linear-gradient(135deg, #2af598, #009efd)", 
+    "linear-gradient(135deg, #fccb90, #d57eeb)", 
+    "linear-gradient(135deg, #200122, #6f0000)"  
+  ];
+
+  const loadingMessages = [
+    "Menghitung gravitasi kasur...",
+    "Mendeteksi kadar kemalasan...",
+    "Menganalisis posisi bantal...",
+    "Menghubungi pakar rebahan..."
+  ];
+
+  function playSound() {
+    const sound = document.getElementById("clickSound");
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+
+  function startQuiz() {
+    playSound();
+    document.getElementById("welcome-screen").style.display = "none";
+    document.getElementById("quiz-ui").style.display = "block";
+    updateUI(0);
+  }
+
+  function updateUI(step) {
+    const progress = (step / totalSteps) * 100;
+    document.getElementById("bar").style.width = progress + "%";
+    if(step <= 2) document.body.style.background = colors[0];
+    else if(step <= 5) document.body.style.background = colors[1];
+    else document.body.style.background = colors[2];
+  }
+
+  function handleSelect(nextStep) {
+    playSound();
+    updateUI(nextStep - 1);
+    setTimeout(() => {
+      document.querySelectorAll('.question-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + nextStep).classList.add('active');
+    }, 300);
+  }
+
+  function mulaiAnalisis() {
+    let total = 0; let complete = true;
+    for (let i = 1; i <= 8; i++) {
+      let r = document.querySelector('input[name="q'+i+'"]:checked');
+      if (r) total += parseInt(r.value); else complete = false;
+    }
+    if (!complete) { alert("Isi semua dulu ya! 😅"); return; }
+    
+    playSound();
+    document.getElementById("quiz-ui").style.display = "none";
+    document.getElementById("loading").style.display = "block";
+
+    let msgIndex = 0;
+    const interval = setInterval(() => {
+      msgIndex++;
+      if(msgIndex < loadingMessages.length) document.getElementById("loading-text").innerText = loadingMessages[msgIndex];
+    }, 600);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      document.getElementById("loading").style.display = "none";
+      hitung(total);
+    }, 2500);
+  }
+
+  function hitung(total) {
+    let level, emoji, desc, gelar;
+    if (total <= 12) {
+      level = "Produktif"; emoji = "🟢"; gelar = "Manusia Paling Rajin";
+      desc = "Wah, kamu spesies langka! Semangatnya nular. 🔥";
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    } else if (total <= 20) {
+      level = "Rebahan Tipis"; emoji = "🟡"; gelar = "Duta Santai Nasional";
+      desc = "Masih batas normal, tapi kasur mulai menggoda. 😏";
+    } else if (total <= 27) {
+      level = "Rebahan Akut"; emoji = "🟠"; gelar = "Atlet Guling Internasional";
+      desc = "Ayo bangun, dunia luar masih ada lho! 😴";
+      document.getElementById("mainCard").classList.add("shake");
+    } else {
+      level = "Sultan Rebahan"; emoji = "🔴"; gelar = "Musuh Bebuyutan Matahari 🗿";
+      desc = "Fix, kamu sudah jadi satu dengan kasur. Legend! 😭";
+      document.body.style.background = colors[3];
+      document.getElementById("mainCard").classList.add("shake");
+    }
+
+    userLevel = level;
+    document.getElementById("result").style.display = "block";
+    document.getElementById("result-content").innerHTML = `
+      <p style="margin:0">Level Kamu:</p>
+      <h2 style="font-size: 1.8rem; margin: 5px 0;">${emoji} ${level}</h2>
+      <div class="gelar">Gelar: ${gelar}</div>
+      <p style="margin-top:15px; font-size:0.9rem;">${desc}</p>
+      <hr style="border:0; border-top:1px solid rgba(255,255,255,0.2); margin:15px 0;">
+    `;
+  }
+
+  function resetQuiz() {
+    document.getElementById("quizForm").reset();
+    document.body.style.background = colors[0];
+    document.getElementById("mainCard").classList.remove("shake");
+    document.getElementById("result").style.display = "none";
+    document.getElementById("welcome-screen").style.display = "block";
+    document.querySelectorAll('.question-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step1').classList.add('active');
+  }
+
+  function shareResult() {
+    const link = "https://s.id/tes-level-rebahan";
+    const text = encodeURIComponent(`Hasil Tes Rebahan-ku: *${userLevel}*! 😴\nCek punyamu di sini: ` + link);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  }
+</script>
+
+</body>
+</html>
