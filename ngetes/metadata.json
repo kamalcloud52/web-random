@@ -1,8 +1,0 @@
-{
-  "name": "GoSerabutan",
-  "description": "Platform pencarian bantuan dan pekerja serabutan lokal dengan cepat dan terpercaya.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
