@@ -1,0 +1,166 @@
+/* ========== VARIABLES & BASE ========== */
+:root {
+    --bg: #f8f8fc;
+    --indigo-50: #eef2ff;
+    --indigo-100: #e0e7ff;
+    --indigo-400: #818cf8;
+    --indigo-500: #6366f1;
+    --violet-400: #a78bfa;
+    --violet-600: #7c3aed;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+* {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: #f8f8fc;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* ========== GLASS & GRADIENT ========== */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.gradient-bg {
+    background:
+        radial-gradient(circle at top right, #ece7ff 0%, transparent 40%),
+        radial-gradient(circle at top left, #ffffff 0%, transparent 50%);
+}
+
+.shadow-soft {
+    box-shadow: var(--shadow-soft);
+}
+
+/* ========== ANIMATIONS ========== */
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(25px);
+    transition: opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+                transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; }
+.reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.12s; }
+.reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.19s; }
+.reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.26s; }
+.reveal-stagger.visible > *:nth-child(5) { transition-delay: 0.33s; }
+.reveal-stagger.visible > * {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Float animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25%      { transform: translateY(-12px) rotate(2deg); }
+    50%      { transform: translateY(-6px) rotate(0deg); }
+    75%      { transform: translateY(-16px) rotate(-2deg); }
+}
+.float-element {
+    animation: float 7s ease-in-out infinite;
+}
+.float-element-delayed {
+    animation: float 8s ease-in-out 1.5s infinite;
+}
+.float-element-slow {
+    animation: float 10s ease-in-out 3s infinite;
+}
+
+/* Button pulse */
+@keyframes pulse-ring {
+    0%   { transform: scale(0.9); opacity: 0; }
+    50%  { opacity: 0.5; }
+    100% { transform: scale(1.15); opacity: 0; }
+}
+.pulse-ring::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.25);
+    animation: pulse-ring 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+    z-index: -1;
+}
+
+/* Mobile menu */
+.mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.mobile-menu.open {
+    max-height: 400px;
+}
+
+/* Card lift */
+.card-lift {
+    transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1),
+                box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.card-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Primary button effect */
+.btn-primary {
+    transition: all 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: inherit;
+    z-index: 0;
+}
+.btn-primary:hover::after {
+    opacity: 1;
+}
+.btn-primary span {
+    position: relative;
+    z-index: 1;
+}
+
+/* Back to top */
+.back-to-top {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Donut spin */
+@keyframes donut-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.donut-ring {
+    animation: donut-spin 4s linear infinite;
+}
