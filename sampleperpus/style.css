@@ -57,7 +57,7 @@ body {
     flex-shrink: 0;
 }
 
-/* === LOGO IMAGE (rounded, tidak lancip) === */
+/* Logo Image */
 .navbar-logo-img {
     width: 36px;
     height: 36px;
@@ -101,7 +101,7 @@ body {
     background: rgba(255,255,255,0.15);
 }
 
-/* Dropdown */
+/* Dropdown Desktop */
 .dropdown { position: relative; }
 .dropdown-menu {
     position: absolute;
@@ -174,7 +174,7 @@ body {
     transform: rotate(-45deg) translate(5px,-5px);
 }
 
-/* Mobile Menu */
+/* ==================== MOBILE MENU ==================== */
 .nav-mobile {
     position: absolute;
     top: var(--nav-height);
@@ -187,8 +187,13 @@ body {
     overflow: hidden;
     transition: max-height 0.5s cubic-bezier(0.25,0.8,0.25,1);
 }
-.nav-mobile.open { max-height: 600px; }
-.nav-mobile ul { list-style: none; padding: 8px 16px; }
+.nav-mobile.open {
+    max-height: 600px;
+}
+.nav-mobile ul {
+    list-style: none;
+    padding: 8px 16px;
+}
 .nav-mobile a {
     display: block;
     color: rgba(255,255,255,0.9);
@@ -197,22 +202,29 @@ body {
     font-size: 0.9rem;
     font-weight: 500;
     border-bottom: 1px solid rgba(255,255,255,0.08);
+
+    /* Animasi dari kiri ke kanan */
     opacity: 0;
-    transform: translateX(-12px);
-    transition: all 0.35s ease;
+    transform: translateX(-40px);
+    transition: all 0.45s cubic-bezier(0.25,0.46,0.45,0.94);
 }
-.nav-mobile.open a { opacity: 1; transform: translateX(0); }
-.nav-mobile.open a:nth-child(1) { transition-delay: 0.03s; }
-.nav-mobile.open a:nth-child(2) { transition-delay: 0.06s; }
-.nav-mobile.open a:nth-child(3) { transition-delay: 0.09s; }
-.nav-mobile.open a:nth-child(4) { transition-delay: 0.12s; }
-.nav-mobile.open a:nth-child(5) { transition-delay: 0.15s; }
-.nav-mobile.open a:nth-child(6) { transition-delay: 0.18s; }
-.nav-mobile.open a:nth-child(7) { transition-delay: 0.21s; }
-.nav-mobile.open a:nth-child(8) { transition-delay: 0.24s; }
-.nav-mobile.open a:nth-child(9) { transition-delay: 0.27s; }
-.nav-mobile.open a:nth-child(10) { transition-delay: 0.30s; }
-.nav-mobile.open a:nth-child(11) { transition-delay: 0.33s; }
+.nav-mobile.open a {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Staggered delay - efek tangga kiri ke kanan */
+.nav-mobile.open a:nth-child(1)  { transition-delay: 0.04s; }
+.nav-mobile.open a:nth-child(2)  { transition-delay: 0.08s; }
+.nav-mobile.open a:nth-child(3)  { transition-delay: 0.12s; }
+.nav-mobile.open a:nth-child(4)  { transition-delay: 0.16s; }
+.nav-mobile.open a:nth-child(5)  { transition-delay: 0.20s; }
+.nav-mobile.open a:nth-child(6)  { transition-delay: 0.24s; }
+.nav-mobile.open a:nth-child(7)  { transition-delay: 0.28s; }
+.nav-mobile.open a:nth-child(8)  { transition-delay: 0.32s; }
+.nav-mobile.open a:nth-child(9)  { transition-delay: 0.36s; }
+.nav-mobile.open a:nth-child(10) { transition-delay: 0.40s; }
+.nav-mobile.open a:nth-child(11) { transition-delay: 0.44s; }
 
 /* ==================== CONTAINER ==================== */
 .container { width:100%; max-width:1200px; margin:0 auto; padding:0 16px; }
