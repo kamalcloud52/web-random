@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Perpustakaan Mathali'ul Falah - Website Resmi</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="icon.jpg">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -20,25 +23,21 @@
 
         <!-- ==================== NAVBAR ==================== -->
         <nav class="navbar" id="navbar">
-            <div class="navbar-container">
+            <div class="navbar-inner">
                 <!-- Logo & Nama -->
                 <a href="#beranda" class="navbar-brand">
-                    <div class="navbar-logo">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
+                    <img src="icon.jpg" alt="Logo PIM" class="navbar-logo-img">
                     <span class="navbar-name">Perpustakaan Digital PIM</span>
                 </a>
 
                 <!-- Desktop Menu -->
-                <ul class="navbar-menu-desktop">
-                    <li><a href="#beranda" class="nav-link active">Beranda</a></li>
-                    <li><a href="#" class="nav-link">Arsip PIM</a></li>
-                    <li><a href="#" class="nav-link">Media PIM</a></li>
-                    <li><a href="#" class="nav-link">Karya Alumni</a></li>
+                <ul class="nav-desktop">
+                    <li><a href="#beranda" class="active">Beranda</a></li>
+                    <li><a href="#">Arsip PIM</a></li>
+                    <li><a href="#">Media PIM</a></li>
+                    <li><a href="#">Karya Alumni</a></li>
                     <li class="dropdown">
-                        <a href="#" class="nav-link dropdown-toggle">
-                            Lainnya <i class="fa-solid fa-chevron-down"></i>
-                        </a>
+                        <a href="#" class="dropdown-toggle">Lainnya <i class="fa-solid fa-chevron-down"></i></a>
                         <ul class="dropdown-menu">
                             <li><a href="#">Arsip Foto PIM</a></li>
                             <li><a href="#">Amanat Majalah PIM</a></li>
@@ -51,8 +50,8 @@
                     </li>
                 </ul>
 
-                <!-- Hamburger (Mobile) -->
-                <button class="navbar-hamburger" id="hamburger" aria-label="Menu">
+                <!-- Hamburger -->
+                <button class="hamburger" id="hamburger" aria-label="Menu">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -60,19 +59,19 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div class="navbar-menu-mobile" id="mobileMenu">
+            <div class="nav-mobile" id="mobileMenu">
                 <ul>
-                    <li><a href="#beranda" class="mobile-link active">Beranda</a></li>
-                    <li><a href="#" class="mobile-link">Arsip PIM</a></li>
-                    <li><a href="#" class="mobile-link">Media PIM</a></li>
-                    <li><a href="#" class="mobile-link">Arsip Foto PIM</a></li>
-                    <li><a href="#" class="mobile-link">Amanat Majalah PIM</a></li>
-                    <li><a href="#" class="mobile-link">Ukhuwwah Majalah PIM</a></li>
-                    <li><a href="#" class="mobile-link">SACRED Majalah PIM</a></li>
-                    <li><a href="#" class="mobile-link">QNS Majalah PIM</a></li>
-                    <li><a href="#" class="mobile-link">Buletin PIM</a></li>
-                    <li><a href="#" class="mobile-link">Karya Alumni</a></li>
-                    <li><a href="#" class="mobile-link">KTA PIM</a></li>
+                    <li><a href="#beranda">Beranda</a></li>
+                    <li><a href="#">Arsip PIM</a></li>
+                    <li><a href="#">Media PIM</a></li>
+                    <li><a href="#">Arsip Foto PIM</a></li>
+                    <li><a href="#">Amanat Majalah PIM</a></li>
+                    <li><a href="#">Ukhuwwah Majalah PIM</a></li>
+                    <li><a href="#">SACRED Majalah PIM</a></li>
+                    <li><a href="#">QNS Majalah PIM</a></li>
+                    <li><a href="#">Buletin PIM</a></li>
+                    <li><a href="#">Karya Alumni</a></li>
+                    <li><a href="#">KTA PIM</a></li>
                 </ul>
             </div>
         </nav>
