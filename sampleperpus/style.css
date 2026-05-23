@@ -201,16 +201,16 @@ body {
     transform: translateX(0);
 }
 .nav-mobile.open li:nth-child(1)  { transition-delay: 0.00s; }
-.nav-mobile.open li:nth-child(2)  { transition-delay: 0.06s; }
-.nav-mobile.open li:nth-child(3)  { transition-delay: 0.12s; }
-.nav-mobile.open li:nth-child(4)  { transition-delay: 0.18s; }
-.nav-mobile.open li:nth-child(5)  { transition-delay: 0.24s; }
-.nav-mobile.open li:nth-child(6)  { transition-delay: 0.30s; }
-.nav-mobile.open li:nth-child(7)  { transition-delay: 0.36s; }
-.nav-mobile.open li:nth-child(8)  { transition-delay: 0.42s; }
-.nav-mobile.open li:nth-child(9)  { transition-delay: 0.48s; }
-.nav-mobile.open li:nth-child(10) { transition-delay: 0.54s; }
-.nav-mobile.open li:nth-child(11) { transition-delay: 0.60s; }
+.nav-mobile.open li:nth-child(2)  { transition-delay: 0.10s; }
+.nav-mobile.open li:nth-child(3)  { transition-delay: 0.20s; }
+.nav-mobile.open li:nth-child(4)  { transition-delay: 0.30s; }
+.nav-mobile.open li:nth-child(5)  { transition-delay: 0.40s; }
+.nav-mobile.open li:nth-child(6)  { transition-delay: 0.50s; }
+.nav-mobile.open li:nth-child(7)  { transition-delay: 0.60s; }
+.nav-mobile.open li:nth-child(8)  { transition-delay: 0.70s; }
+.nav-mobile.open li:nth-child(9)  { transition-delay: 0.80s; }
+.nav-mobile.open li:nth-child(10) { transition-delay: 0.90s; }
+.nav-mobile.open li:nth-child(11) { transition-delay: 1.00s; }
 
 .nav-mobile a {
     display: block;
