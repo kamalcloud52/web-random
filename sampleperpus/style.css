@@ -384,12 +384,32 @@ h3 { font-size:1.1rem; font-weight:600; color:var(--primary); margin-bottom:8px;
 
 /* ==================== LOADING & CONTENT ==================== */
 .loading-text { color:#6b7280; font-style:italic; font-size:0.9rem; }
-.content-text { color:#374151; white-space:pre-line; text-align:justify; line-height:1.6; font-size:0.9rem; }
+.content-text {
+    color: #374151;
+    white-space: pre-line;
+    text-align: justify;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
 .toggle-area { margin-top:16px; display:flex; gap:12px; align-items:center; }
 .toggle-link { color:#059669; font-weight:600; font-size:0.85rem; text-decoration:none; }
 .toggle-link:hover { text-decoration:underline; }
 .toggle-icon { font-size:0.65rem; }
 .retry-btn { font-size:0.85rem; color:#059669; background:none; border:none; cursor:pointer; }
+
+/* Animasi expand/collapse untuk full text */
+#history-full,
+#vision-full {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.45s ease, opacity 0.35s ease;
+}
+#history-full:not(.hidden),
+#vision-full:not(.hidden) {
+    max-height: 2000px;
+    opacity: 1;
+}
 
 /* ==================== ARSIP ==================== */
 .arsip-section { background:linear-gradient(135deg, #047857 0%, #065f46 100%); color:white; }
@@ -403,7 +423,10 @@ h3 { font-size:1.1rem; font-weight:600; color:var(--primary); margin-bottom:8px;
     color: white;
     text-decoration: none;
     transition: all 0.3s;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 .arsip-card:hover { background:rgba(255,255,255,0.2); transform:translateY(-4px); }
 .arsip-card i { font-size:2rem; color:#FCD34D; margin-bottom:8px; display:block; }
