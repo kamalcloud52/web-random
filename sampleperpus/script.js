@@ -2,28 +2,27 @@
     // ==================== NAVBAR ====================
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobileMenu');
-    
+
     hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
+        hamburger.classList.toggle('open');
         mobileMenu.classList.toggle('open');
     });
-    
-    // Tutup mobile menu saat link diklik
-    document.querySelectorAll('.mobile-link').forEach(link => {
+
+    document.querySelectorAll('.nav-mobile li a').forEach(link => {
         link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
+            hamburger.classList.remove('open');
             mobileMenu.classList.remove('open');
         });
     });
-    
+
     // Navbar scroll effect
     window.addEventListener('scroll', () => {
         const navbar = document.getElementById('navbar');
         if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(4, 120, 87, 0.98)';
-            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.2)';
+            navbar.style.background = 'rgba(4,120,87,0.98)';
+            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.25)';
         } else {
-            navbar.style.background = 'rgba(4, 120, 87, 0.95)';
+            navbar.style.background = 'rgba(4,120,87,0.95)';
             navbar.style.boxShadow = '0 2px 12px rgba(0,0,0,0.15)';
         }
     });
@@ -49,7 +48,6 @@
     });
 
     let interval = setInterval(() => showSlide(current + 1), 5000);
-
     function resetInterval() {
         clearInterval(interval);
         interval = setInterval(() => showSlide(current + 1), 5000);
@@ -65,7 +63,6 @@
             }
         });
     }, { threshold: 0.1 });
-
     fadeEls.forEach(el => observer.observe(el));
 
     // ==================== FETCH GOOGLE DOCS ====================
@@ -74,9 +71,7 @@
             const res = await fetch(`https://docs.google.com/document/d/${docId}/export?format=txt`);
             if (!res.ok) throw new Error('Gagal');
             return (await res.text()).trim();
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
     function truncate(text, max = 300) {
@@ -91,11 +86,8 @@
         const fullEl = document.getElementById(fullId);
         const toggleBtn = document.getElementById(toggleId);
         const retryBtn = document.getElementById(retryId);
-        
         if (!loadEl || !contentEl) return;
-        
-        let fullText = '';
-        let expanded = false;
+        let fullText = '', expanded = false;
 
         function render(text) {
             fullText = text;
@@ -107,6 +99,8 @@
             expanded = false;
             previewEl.classList.remove('hidden');
             fullEl.classList.add('hidden');
+            fullEl.style.maxHeight = '0';
+            fullEl.style.opacity = '0';
             toggleBtn.innerHTML = 'Selengkapnya <i class="fa-solid fa-arrow-right" style="font-size:0.65rem;"></i>';
         }
 
@@ -129,12 +123,22 @@
             if (!fullText) return;
             expanded = !expanded;
             if (expanded) {
+                // Buka
                 previewEl.classList.add('hidden');
                 fullEl.classList.remove('hidden');
+                // Force reflow
+                fullEl.offsetHeight;
+                fullEl.style.maxHeight = fullEl.scrollHeight + 'px';
+                fullEl.style.opacity = '1';
                 toggleBtn.innerHTML = '<i class="fa-solid fa-arrow-left" style="font-size:0.65rem;"></i> Lebih sedikit';
             } else {
-                previewEl.classList.remove('hidden');
-                fullEl.classList.add('hidden');
+                // Tutup
+                fullEl.style.maxHeight = '0';
+                fullEl.style.opacity = '0';
+                setTimeout(() => {
+                    fullEl.classList.add('hidden');
+                    previewEl.classList.remove('hidden');
+                }, 450);
                 toggleBtn.innerHTML = 'Selengkapnya <i class="fa-solid fa-arrow-right" style="font-size:0.65rem;"></i>';
             }
         });
