@@ -689,7 +689,7 @@
                         if (json.status === "success") {
                             camabaList = json.data || [];
                             
-                            // 🔥 Bersihkan semua data tanggal
+                            // Bersihkan semua data tanggal
                             camabaList = camabaList.map(item => {
                                 if (item.tanggal) {
                                     item.tanggal = String(item.tanggal).trim().substring(0, 10);
@@ -877,7 +877,7 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter tanggal dengan debug
+        // 🔥 PERBAIKAN: Filter tanggal dengan substring dan debug
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
@@ -886,6 +886,7 @@
 
             console.log("🔍 Filter yang dipilih:", { fSearch, fFakultas, fTanggal, fSesi });
 
+            // Jika semua filter kosong, tampilkan semua data
             if (!fSearch && !fFakultas && !fTanggal && !fSesi) {
                 console.log("📊 Tidak ada filter, tampilkan semua data");
                 renderCards(camabaList);
@@ -899,12 +900,15 @@
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
                 const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
                 
+                // 🔥 PERBAIKAN: Filter tanggal dengan substring 10 karakter
                 let matchTanggal = true;
                 if (fTanggal) {
-                    const itemTanggal = item.tanggal ? String(item.tanggal).trim() : '';
-                    const filterTanggal = String(fTanggal).trim();
+                    // Ambil 10 karakter pertama dari tanggal (YYYY-MM-DD)
+                    const itemTanggal = item.tanggal ? String(item.tanggal).substring(0, 10) : '';
+                    const filterTanggal = String(fTanggal).substring(0, 10);
                     matchTanggal = itemTanggal === filterTanggal;
                     
+                    // Debug
                     if (!matchTanggal) {
                         console.log(`❌ Tidak match: "${itemTanggal}" vs "${filterTanggal}"`);
                     }
