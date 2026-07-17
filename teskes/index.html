@@ -287,16 +287,16 @@
                         <select id="filter-tanggal" onchange="applyFilters()" 
                             class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
                             <option value="">Semua</option>
-                            <option value="2026-08-01">1 Agustus</option>
-                            <option value="2026-08-02">2 Agustus</option>
-                            <option value="2026-08-03">3 Agustus</option>
-                            <option value="2026-08-04">4 Agustus</option>
-                            <option value="2026-08-05">5 Agustus</option>
-                            <option value="2026-08-06">6 Agustus</option>
-                            <option value="2026-08-07">7 Agustus</option>
-                            <option value="2026-08-08">8 Agustus</option>
-                            <option value="2026-08-09">9 Agustus</option>
-                            <option value="2026-08-10">10 Agustus</option>
+                            <option value="2026-08-01">1 Agt</option>
+                            <option value="2026-08-02">2 Agt</option>
+                            <option value="2026-08-03">3 Agt</option>
+                            <option value="2026-08-04">4 Agt</option>
+                            <option value="2026-08-05">5 Agt</option>
+                            <option value="2026-08-06">6 Agt</option>
+                            <option value="2026-08-07">7 Agt</option>
+                            <option value="2026-08-08">8 Agt</option>
+                            <option value="2026-08-09">9 Agt</option>
+                            <option value="2026-08-10">10 Agt</option>
                         </select>
                     </div>
 
@@ -561,13 +561,12 @@
             
             if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 const parts = dateString.split('-');
-                const date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+                const date = new Date(parts[0], parts[1] - 1, parts[2]);
                 return date.toLocaleDateString('id-ID', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
-                    day: 'numeric',
-                    timeZone: 'UTC'
+                    day: 'numeric' 
                 });
             }
             
@@ -577,8 +576,7 @@
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric',
-                timeZone: 'UTC'
+                day: 'numeric' 
             });
         }
 
@@ -593,29 +591,16 @@
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i><span>Mengirim Data...</span>';
 
             const generatedSessionCode = generateSessionCodePreview();
-            
-            let kontak = document.getElementById('kontak').value.trim();
-            const jenisKontak = document.getElementById('jenis-kontak').value;
-            
-            if (jenisKontak === 'WhatsApp' && kontak && !kontak.startsWith('0')) {
-                if (kontak.startsWith('62')) {
-                    kontak = '0' + kontak.substring(2);
-                } else {
-                    kontak = '0' + kontak;
-                }
-            }
-
-            const tanggalValue = document.getElementById('tanggal').value;
 
             const payload = {
                 nama: document.getElementById('nama').value.trim(),
                 fakultas: document.getElementById('fakultas').value,
                 prodi: document.getElementById('prodi').value,
-                tanggal: tanggalValue,
+                tanggal: document.getElementById('tanggal').value,
                 sesi: document.getElementById('sesi').value,
                 kodeSesi: generatedSessionCode,
-                jenisKontak: jenisKontak,
-                kontak: kontak
+                jenisKontak: document.getElementById('jenis-kontak').value,
+                kontak: document.getElementById('kontak').value.trim()
             };
 
             fetch(API_URL, {
@@ -688,17 +673,7 @@
                         
                         if (json.status === "success") {
                             camabaList = json.data || [];
-                            
-                            // Bersihkan semua data tanggal
-                            camabaList = camabaList.map(item => {
-                                if (item.tanggal) {
-                                    item.tanggal = String(item.tanggal).trim().substring(0, 10);
-                                }
-                                return item;
-                            });
-                            
                             console.log("📊 Total data:", camabaList.length);
-                            console.log("📊 Contoh tanggal:", camabaList.length > 0 ? camabaList[0].tanggal : 'tidak ada');
                             
                             if (camabaList.length === 0) {
                                 emptyState.classList.remove('hidden');
@@ -877,7 +852,7 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter tanggal - perbandingan langsung tanpa mengubah data
+        // 🔥 PERBAIKAN UTAMA: Filter tanggal dengan split('T')[0]
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
@@ -886,7 +861,6 @@
 
             console.log("🔍 Filter Tanggal:", fTanggal);
 
-            // Jika semua filter kosong, tampilkan semua data
             if (!fSearch && !fFakultas && !fTanggal && !fSesi) {
                 renderCards(camabaList);
                 return;
@@ -899,10 +873,20 @@
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
                 const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
                 
-                // 🔥 PERBAIKAN: Filter tanggal - bandingkan langsung tanpa mengubah apapun
+                // 🔥 PERBAIKAN: Filter tanggal dengan split('T')[0]
                 let matchTanggal = true;
                 if (fTanggal) {
-                    matchTanggal = item.tanggal === fTanggal;
+                    // Pastikan tanggal dalam format YYYY-MM-DD
+                    let itemTanggal = item.tanggal || '';
+                    // Jika ada 'T', ambil bagian sebelum T (format ISO)
+                    if (itemTanggal.includes('T')) {
+                        itemTanggal = itemTanggal.split('T')[0];
+                    }
+                    // Jika panjang lebih dari 10, ambil 10 karakter pertama
+                    if (itemTanggal.length > 10) {
+                        itemTanggal = itemTanggal.substring(0, 10);
+                    }
+                    matchTanggal = itemTanggal === fTanggal;
                 }
                 
                 const matchSesi = !fSesi || (item.sesi && item.sesi.includes(fSesi));
