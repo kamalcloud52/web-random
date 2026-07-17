@@ -877,18 +877,17 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter tanggal dengan substring dan debug
+        // 🔥 PERBAIKAN: Filter tanggal - perbandingan langsung tanpa mengubah data
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
             const fTanggal = document.getElementById('filter-tanggal').value;
             const fSesi = document.getElementById('filter-sesi').value;
 
-            console.log("🔍 Filter yang dipilih:", { fSearch, fFakultas, fTanggal, fSesi });
+            console.log("🔍 Filter Tanggal:", fTanggal);
 
             // Jika semua filter kosong, tampilkan semua data
             if (!fSearch && !fFakultas && !fTanggal && !fSesi) {
-                console.log("📊 Tidak ada filter, tampilkan semua data");
                 renderCards(camabaList);
                 return;
             }
@@ -900,27 +899,15 @@
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
                 const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
                 
-                // 🔥 PERBAIKAN: Filter tanggal dengan substring 10 karakter
+                // 🔥 PERBAIKAN: Filter tanggal - bandingkan langsung tanpa mengubah apapun
                 let matchTanggal = true;
                 if (fTanggal) {
-                    // Ambil 10 karakter pertama dari tanggal (YYYY-MM-DD)
-                    const itemTanggal = item.tanggal ? String(item.tanggal).substring(0, 10) : '';
-                    const filterTanggal = String(fTanggal).substring(0, 10);
-                    matchTanggal = itemTanggal === filterTanggal;
-                    
-                    // Debug
-                    if (!matchTanggal) {
-                        console.log(`❌ Tidak match: "${itemTanggal}" vs "${filterTanggal}"`);
-                    }
+                    matchTanggal = item.tanggal === fTanggal;
                 }
                 
                 const matchSesi = !fSesi || (item.sesi && item.sesi.includes(fSesi));
 
-                const result = matchSearch && matchFakultas && matchTanggal && matchSesi;
-                if (result) {
-                    console.log("✅ Match:", item.nama, item.tanggal);
-                }
-                return result;
+                return matchSearch && matchFakultas && matchTanggal && matchSesi;
             });
 
             console.log("📊 Hasil filter:", filteredData.length, "data");
