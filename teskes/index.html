@@ -852,14 +852,12 @@
             `;
         }
 
-        // 🔥 PERBAIKAN UTAMA: Filter tanggal dengan split('T')[0]
+        // 🔥 PERBAIKAN: Filter tanggal dengan includes()
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
             const fTanggal = document.getElementById('filter-tanggal').value;
             const fSesi = document.getElementById('filter-sesi').value;
-
-            console.log("🔍 Filter Tanggal:", fTanggal);
 
             if (!fSearch && !fFakultas && !fTanggal && !fSesi) {
                 renderCards(camabaList);
@@ -872,29 +870,12 @@
                     (item.prodi && item.prodi.toLowerCase().includes(fSearch)) ||
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
                 const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
-                
-                // 🔥 PERBAIKAN: Filter tanggal dengan split('T')[0]
-                let matchTanggal = true;
-                if (fTanggal) {
-                    // Pastikan tanggal dalam format YYYY-MM-DD
-                    let itemTanggal = item.tanggal || '';
-                    // Jika ada 'T', ambil bagian sebelum T (format ISO)
-                    if (itemTanggal.includes('T')) {
-                        itemTanggal = itemTanggal.split('T')[0];
-                    }
-                    // Jika panjang lebih dari 10, ambil 10 karakter pertama
-                    if (itemTanggal.length > 10) {
-                        itemTanggal = itemTanggal.substring(0, 10);
-                    }
-                    matchTanggal = itemTanggal === fTanggal;
-                }
-                
+                const matchTanggal = !fTanggal || (item.tanggal && item.tanggal.includes(fTanggal));
                 const matchSesi = !fSesi || (item.sesi && item.sesi.includes(fSesi));
 
                 return matchSearch && matchFakultas && matchTanggal && matchSesi;
             });
 
-            console.log("📊 Hasil filter:", filteredData.length, "data");
             renderCards(filteredData);
         }
 
