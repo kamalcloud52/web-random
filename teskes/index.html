@@ -287,16 +287,16 @@
                         <select id="filter-tanggal" onchange="applyFilters()" 
                             class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
                             <option value="">Semua</option>
-                            <option value="2026-08-01">1 Agt</option>
-                            <option value="2026-08-02">2 Agt</option>
-                            <option value="2026-08-03">3 Agt</option>
-                            <option value="2026-08-04">4 Agt</option>
-                            <option value="2026-08-05">5 Agt</option>
-                            <option value="2026-08-06">6 Agt</option>
-                            <option value="2026-08-07">7 Agt</option>
-                            <option value="2026-08-08">8 Agt</option>
-                            <option value="2026-08-09">9 Agt</option>
-                            <option value="2026-08-10">10 Agt</option>
+                            <option value="2026-08-01">1 Agustus</option>
+                            <option value="2026-08-02">2 Agustus</option>
+                            <option value="2026-08-03">3 Agustus</option>
+                            <option value="2026-08-04">4 Agustus</option>
+                            <option value="2026-08-05">5 Agustus</option>
+                            <option value="2026-08-06">6 Agustus</option>
+                            <option value="2026-08-07">7 Agustus</option>
+                            <option value="2026-08-08">8 Agustus</option>
+                            <option value="2026-08-09">9 Agustus</option>
+                            <option value="2026-08-10">10 Agustus</option>
                         </select>
                     </div>
 
@@ -556,30 +556,29 @@
             }
         }
 
-        // 🔥 PERBAIKAN: Format tanggal dengan handling yang lebih baik
         function formatDateIndo(dateString) {
             if (!dateString) return "-";
             
-            // Jika formatnya "2026-08-01"
             if (typeof dateString === 'string' && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
                 const parts = dateString.split('-');
-                const date = new Date(parts[0], parts[1] - 1, parts[2]);
+                const date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
                 return date.toLocaleDateString('id-ID', { 
                     weekday: 'long', 
                     year: 'numeric', 
                     month: 'long', 
-                    day: 'numeric' 
+                    day: 'numeric',
+                    timeZone: 'UTC'
                 });
             }
             
-            // Fallback untuk format lain
             const date = new Date(dateString);
             if (isNaN(date.getTime())) return dateString;
             return date.toLocaleDateString('id-ID', { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric' 
+                day: 'numeric',
+                timeZone: 'UTC'
             });
         }
 
@@ -594,16 +593,29 @@
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i><span>Mengirim Data...</span>';
 
             const generatedSessionCode = generateSessionCodePreview();
+            
+            let kontak = document.getElementById('kontak').value.trim();
+            const jenisKontak = document.getElementById('jenis-kontak').value;
+            
+            if (jenisKontak === 'WhatsApp' && kontak && !kontak.startsWith('0')) {
+                if (kontak.startsWith('62')) {
+                    kontak = '0' + kontak.substring(2);
+                } else {
+                    kontak = '0' + kontak;
+                }
+            }
+
+            const tanggalValue = document.getElementById('tanggal').value;
 
             const payload = {
                 nama: document.getElementById('nama').value.trim(),
                 fakultas: document.getElementById('fakultas').value,
                 prodi: document.getElementById('prodi').value,
-                tanggal: document.getElementById('tanggal').value,
+                tanggal: tanggalValue,
                 sesi: document.getElementById('sesi').value,
                 kodeSesi: generatedSessionCode,
-                jenisKontak: document.getElementById('jenis-kontak').value,
-                kontak: document.getElementById('kontak').value.trim()
+                jenisKontak: jenisKontak,
+                kontak: kontak
             };
 
             fetch(API_URL, {
@@ -676,7 +688,17 @@
                         
                         if (json.status === "success") {
                             camabaList = json.data || [];
+                            
+                            // 🔥 Bersihkan semua data tanggal
+                            camabaList = camabaList.map(item => {
+                                if (item.tanggal) {
+                                    item.tanggal = String(item.tanggal).trim().substring(0, 10);
+                                }
+                                return item;
+                            });
+                            
                             console.log("📊 Total data:", camabaList.length);
+                            console.log("📊 Contoh tanggal:", camabaList.length > 0 ? camabaList[0].tanggal : 'tidak ada');
                             
                             if (camabaList.length === 0) {
                                 emptyState.classList.remove('hidden');
@@ -855,14 +877,17 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter tanggal dengan substring
+        // 🔥 PERBAIKAN: Filter tanggal dengan debug
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
             const fTanggal = document.getElementById('filter-tanggal').value;
             const fSesi = document.getElementById('filter-sesi').value;
 
+            console.log("🔍 Filter yang dipilih:", { fSearch, fFakultas, fTanggal, fSesi });
+
             if (!fSearch && !fFakultas && !fTanggal && !fSesi) {
+                console.log("📊 Tidak ada filter, tampilkan semua data");
                 renderCards(camabaList);
                 return;
             }
@@ -873,12 +898,28 @@
                     (item.prodi && item.prodi.toLowerCase().includes(fSearch)) ||
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
                 const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
-                const matchTanggal = !fTanggal || (item.tanggal && item.tanggal.substring(0, 10) === fTanggal);
+                
+                let matchTanggal = true;
+                if (fTanggal) {
+                    const itemTanggal = item.tanggal ? String(item.tanggal).trim() : '';
+                    const filterTanggal = String(fTanggal).trim();
+                    matchTanggal = itemTanggal === filterTanggal;
+                    
+                    if (!matchTanggal) {
+                        console.log(`❌ Tidak match: "${itemTanggal}" vs "${filterTanggal}"`);
+                    }
+                }
+                
                 const matchSesi = !fSesi || (item.sesi && item.sesi.includes(fSesi));
 
-                return matchSearch && matchFakultas && matchTanggal && matchSesi;
+                const result = matchSearch && matchFakultas && matchTanggal && matchSesi;
+                if (result) {
+                    console.log("✅ Match:", item.nama, item.tanggal);
+                }
+                return result;
             });
 
+            console.log("📊 Hasil filter:", filteredData.length, "data");
             renderCards(filteredData);
         }
 
