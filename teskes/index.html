@@ -13,33 +13,72 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
+        /* Animasi smooth untuk tab button */
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        /* Header mobile improvement */
+        @media (max-width: 640px) {
+            .header-title {
+                font-size: 0.9rem;
+            }
+            .header-subtitle {
+                font-size: 0.65rem;
+            }
+            .header-logo {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            .tab-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.6rem;
+            }
+            .tab-btn i {
+                font-size: 0.7rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header -->
+    <!-- Header yang sudah diperbaiki untuk mobile & desktop -->
     <header class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b-4 border-amber-500">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="bg-amber-500 text-blue-950 p-2.5 rounded-xl shadow-md font-bold">
-                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+        <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
+            <!-- Baris 1: Logo & Judul -->
+            <div class="flex flex-row items-center justify-between gap-2">
+                <!-- Logo & Judul -->
+                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div class="header-logo bg-amber-500 text-blue-950 p-1.5 sm:p-2.5 rounded-xl shadow-md font-bold flex-shrink-0">
+                        <i class="fa-solid fa-graduation-cap text-base sm:text-xl"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h1 class="header-title text-sm sm:text-xl font-bold tracking-tight flex items-center gap-1 sm:gap-2 flex-wrap">
+                            <span class="truncate">TemanSe-Sehat UNNES</span>
+                            <span class="bg-amber-400 text-blue-950 text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-extrabold uppercase flex-shrink-0">Camaba 2026</span>
+                        </h1>
+                        <p class="header-subtitle text-[10px] sm:text-xs text-slate-300 truncate hidden xs:block">Direktori Cari Teman Tes Kesehatan UNNES</p>
+                    </div>
                 </div>
-                <div class="text-center sm:text-left">
-                    <h1 class="text-xl font-bold tracking-tight flex items-center justify-center sm:justify-start gap-2">
-                        <span>TemanSe-Sehat UNNES</span>
-                        <span class="bg-amber-400 text-blue-950 text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase">Camaba 2026</span>
-                    </h1>
-                    <p class="text-xs text-slate-300">Direktori Cari Teman Tes Kesehatan Universitas Negeri Semarang</p>
+
+                <!-- Tombol Tab versi mobile (hanya icon) -->
+                <div class="flex sm:hidden bg-blue-950/50 p-1 rounded-xl border border-blue-800/50 gap-1 flex-shrink-0">
+                    <button onclick="switchTab('daftar')" id="btn-tab-daftar-mobile" class="tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow">
+                        <i class="fa-solid fa-pen-to-square text-xs"></i>
+                    </button>
+                    <button onclick="switchTab('pantau')" id="btn-tab-pantau-mobile" class="tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-users text-xs"></i>
+                    </button>
                 </div>
-            </div>
-            <!-- Navigation Tabs -->
-            <div class="flex bg-blue-950/50 p-1.5 rounded-xl border border-blue-800/50">
-                <button onclick="switchTab('daftar')" id="btn-tab-daftar" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow">
-                    <i class="fa-solid fa-user-plus mr-1"></i> Isi Data Poling
-                </button>
-                <button onclick="switchTab('pantau')" id="btn-tab-pantau" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
-                    <i class="fa-solid fa-users mr-1"></i> Cari Teman
-                </button>
+
+                <!-- Tombol Tab versi desktop -->
+                <div class="hidden sm:flex bg-blue-950/50 p-1.5 rounded-xl border border-blue-800/50 flex-shrink-0">
+                    <button onclick="switchTab('daftar')" id="btn-tab-daftar" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow">
+                        <i class="fa-solid fa-user-plus mr-1"></i> Isi Data Poling
+                    </button>
+                    <button onclick="switchTab('pantau')" id="btn-tab-pantau" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-users mr-1"></i> Cari Teman
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -48,14 +87,14 @@
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
         
         <!-- Welcome Banner -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-4 sm:p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-start space-x-3.5">
                 <div class="bg-blue-600 text-white p-2 rounded-lg mt-1 hidden sm:block">
                     <i class="fa-solid fa-bullhorn text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-blue-950 text-base">Cari Teman Seperjuangan Tes Kesehatan UNNES!</h3>
-                    <p class="text-sm text-blue-800 mt-0.5 leading-relaxed">
+                    <h3 class="font-bold text-blue-950 text-sm sm:text-base">Cari Teman Seperjuangan Tes Kesehatan UNNES!</h3>
+                    <p class="text-xs sm:text-sm text-blue-800 mt-0.5 leading-relaxed">
                         Masukkan jadwal tes kesehatanmu mulai tanggal <strong>1 s.d 10 Agustus 2026</strong>. Saling sapa, koordinasi berangkat bareng, atau buat grup komunikasi agar tidak sendirian saat di lokasi tes kesehatan UNNES!
                     </p>
                 </div>
@@ -65,15 +104,15 @@
         <!-- TAB 1: FORM REGISTER POLING -->
         <div id="tab-daftar" class="block max-w-3xl mx-auto">
             <!-- Registration Form -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
-                <div class="border-b border-slate-100 pb-4 mb-6">
-                    <h2 class="text-lg font-bold text-slate-900 flex items-center">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-3 sm:pb-4 mb-4 sm:mb-6">
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center">
                         <i class="fa-solid fa-file-signature text-amber-500 mr-2"></i> Form Jadwal Tes Kesehatan
                     </h2>
                     <p class="text-xs text-slate-500">Silakan isi data diri dan jadwal tes kesehatan Anda untuk dipoling.</p>
                 </div>
 
-                <form id="formPoling" onsubmit="submitForm(event)" class="space-y-5">
+                <form id="formPoling" onsubmit="submitForm(event)" class="space-y-4 sm:space-y-5">
                     <!-- Nama Lengkap -->
                     <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="nama">Nama Lengkap</label>
@@ -82,12 +121,12 @@
                                 <i class="fa-solid fa-user-graduate"></i>
                             </span>
                             <input type="text" id="nama" required placeholder="Masukkan nama lengkap Anda" 
-                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
+                                class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
                         </div>
                     </div>
 
                     <!-- Fakultas & Prodi (Dinamis UNNES) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="fakultas">Fakultas</label>
                             <div class="relative">
@@ -95,7 +134,7 @@
                                     <i class="fa-solid fa-school"></i>
                                 </span>
                                 <select id="fakultas" required onchange="updateProdiDropdown()"
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
                                     <option value="" disabled selected>Pilih Fakultas</option>
                                     <option value="FIPP">FIPP (Ilmu Pendidikan & Psikologi)</option>
                                     <option value="FBS">FBS (Bahasa dan Seni)</option>
@@ -121,7 +160,7 @@
                                     <i class="fa-solid fa-book-bookmark"></i>
                                 </span>
                                 <select id="prodi" required disabled
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer disabled:opacity-60">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer disabled:opacity-60">
                                     <option value="" disabled selected>Pilih Fakultas Terlebih Dahulu</option>
                                 </select>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
@@ -132,7 +171,7 @@
                     </div>
 
                     <!-- Tanggal & Sesi -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="tanggal">Tanggal Tes (1-10 Agustus 2026)</label>
                             <div class="relative">
@@ -140,7 +179,7 @@
                                     <i class="fa-solid fa-calendar-day"></i>
                                 </span>
                                 <select id="tanggal" required onchange="generateSessionCodePreview()"
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
                                     <option value="" disabled selected>Pilih Tanggal</option>
                                     <option value="2026-08-01">1 Agustus 2026</option>
                                     <option value="2026-08-02">2 Agustus 2026</option>
@@ -166,7 +205,7 @@
                                     <i class="fa-solid fa-clock"></i>
                                 </span>
                                 <select id="sesi" required onchange="generateSessionCodePreview()"
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
                                     <option value="" disabled selected>Pilih Sesi</option>
                                     <option value="Sesi 1">Sesi 1 (08.00 - 10.00 WIB)</option>
                                     <option value="Sesi 2">Sesi 2 (10.00 - 11.30 WIB)</option>
@@ -182,7 +221,7 @@
                     </div>
 
                     <!-- Kontak Medsos/Chat -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="jenis-kontak">Tipe Kontak</label>
                             <div class="relative">
@@ -190,7 +229,7 @@
                                     <i class="fa-solid fa-address-card"></i>
                                 </span>
                                 <select id="jenis-kontak" required onchange="updateContactPlaceholder()"
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
                                     <option value="WhatsApp">WhatsApp</option>
                                     <option value="Telegram">Telegram</option>
                                     <option value="Instagram">Instagram</option>
@@ -201,14 +240,14 @@
                             </div>
                         </div>
 
-                        <div class="md:col-span-2">
+                        <div class="sm:col-span-2">
                             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="kontak" id="label-kontak">Nomor WhatsApp</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400" id="icon-kontak">
                                     <i class="fa-brands fa-whatsapp text-lg text-emerald-500"></i>
                                 </span>
                                 <input type="text" id="kontak" required placeholder="Contoh: 081234567890" 
-                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
+                                    class="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
                             </div>
                         </div>
                     </div>
@@ -219,7 +258,7 @@
                     <!-- Submit Button -->
                     <div class="pt-2">
                         <button type="submit" id="btn-submit"
-                            class="w-full bg-gradient-to-r from-blue-900 to-indigo-950 hover:from-blue-950 hover:to-slate-900 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center space-x-2">
+                            class="w-full bg-gradient-to-r from-blue-900 to-indigo-950 hover:from-blue-950 hover:to-slate-900 text-white font-bold py-3 sm:py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center space-x-2 text-sm sm:text-base">
                             <i class="fa-solid fa-paper-plane"></i>
                             <span>Kirim & Gabung Poling</span>
                         </button>
@@ -231,18 +270,19 @@
         <!-- TAB 2: DIREKTORI PENCARIAN TEMAN -->
         <div id="tab-pantau" class="hidden">
             <!-- Filter & Search Panel -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-5 mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                    <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
                         <i class="fa-solid fa-sliders text-amber-500 mr-2"></i> Penyaringan Pencarian Teman
                     </h2>
                     <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
                         <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
-                        <span>Segarkan Data</span>
+                        <span class="hidden sm:inline">Segarkan Data</span>
+                        <span class="sm:hidden">Refresh</span>
                     </button>
                 </div>
                 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                     <!-- Search Input -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Nama atau Prodi</label>
@@ -250,7 +290,7 @@
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
-                            <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari prodi/nama..." 
+                            <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari..." 
                                 class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
                         </div>
                     </div>
@@ -260,17 +300,17 @@
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Fakultas</label>
                         <select id="filter-fakultas" onchange="applyFilters()" 
                             class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
-                            <option value="">Semua Fakultas</option>
-                            <option value="FIPP">FIPP (Ilmu Pendidikan & Psikologi)</option>
-                            <option value="FBS">FBS (Bahasa dan Seni)</option>
-                            <option value="FISIP">FISIP (Ilmu Sosial & Ilmu Politik)</option>
-                            <option value="FMIPA">FMIPA (Matematika & IPA)</option>
-                            <option value="FT">FT (Teknik)</option>
-                            <option value="FIK">FIK (Ilmu Keolahragaan)</option>
-                            <option value="FEB">FEB (Ekonomika dan Bisnis)</option>
-                            <option value="FH">FH (Hukum)</option>
-                            <option value="FK">FK (Kedokteran)</option>
-                            <option value="Pascasarjana">Sekolah Pascasarjana</option>
+                            <option value="">Semua</option>
+                            <option value="FIPP">FIPP</option>
+                            <option value="FBS">FBS</option>
+                            <option value="FISIP">FISIP</option>
+                            <option value="FMIPA">FMIPA</option>
+                            <option value="FT">FT</option>
+                            <option value="FIK">FIK</option>
+                            <option value="FEB">FEB</option>
+                            <option value="FH">FH</option>
+                            <option value="FK">FK</option>
+                            <option value="Pascasarjana">Pascasarjana</option>
                         </select>
                     </div>
 
@@ -279,17 +319,17 @@
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Tanggal Tes</label>
                         <select id="filter-tanggal" onchange="applyFilters()" 
                             class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
-                            <option value="">Semua Tanggal (1-10 Agt)</option>
-                            <option value="2026-08-01">1 Agustus 2026</option>
-                            <option value="2026-08-02">2 Agustus 2026</option>
-                            <option value="2026-08-03">3 Agustus 2026</option>
-                            <option value="2026-08-04">4 Agustus 2026</option>
-                            <option value="2026-08-05">5 Agustus 2026</option>
-                            <option value="2026-08-06">6 Agustus 2026</option>
-                            <option value="2026-08-07">7 Agustus 2026</option>
-                            <option value="2026-08-08">8 Agustus 2026</option>
-                            <option value="2026-08-09">9 Agustus 2026</option>
-                            <option value="2026-08-10">10 Agustus 2026</option>
+                            <option value="">Semua</option>
+                            <option value="2026-08-01">1 Agt</option>
+                            <option value="2026-08-02">2 Agt</option>
+                            <option value="2026-08-03">3 Agt</option>
+                            <option value="2026-08-04">4 Agt</option>
+                            <option value="2026-08-05">5 Agt</option>
+                            <option value="2026-08-06">6 Agt</option>
+                            <option value="2026-08-07">7 Agt</option>
+                            <option value="2026-08-08">8 Agt</option>
+                            <option value="2026-08-09">9 Agt</option>
+                            <option value="2026-08-10">10 Agt</option>
                         </select>
                     </div>
 
@@ -298,32 +338,32 @@
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Sesi Tes</label>
                         <select id="filter-sesi" onchange="applyFilters()" 
                             class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
-                            <option value="">Semua Sesi</option>
-                            <option value="Sesi 1">Sesi 1 (08.00 - 10.00)</option>
-                            <option value="Sesi 2">Sesi 2 (10.00 - 11.30)</option>
-                            <option value="Sesi 3">Sesi 3 (13.00 - 15.00)</option>
-                            <option value="Sesi 4">Sesi 4 (15.00 - 16.30)</option>
+                            <option value="">Semua</option>
+                            <option value="Sesi 1">Sesi 1</option>
+                            <option value="Sesi 2">Sesi 2</option>
+                            <option value="Sesi 3">Sesi 3</option>
+                            <option value="Sesi 4">Sesi 4</option>
                         </select>
                     </div>
                 </div>
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 text-center" id="stats-container">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 text-center" id="stats-container">
                 <!-- Diisi otomatis melalui JS -->
             </div>
 
             <!-- Directory Card Grid -->
-        <div>
-            <!-- Loading State -->
-            <div id="loading-state" class="py-16 text-center">
-                <div class="flex flex-col items-center justify-center space-y-3">
-                    <div class="w-12 h-12 border-4 border-blue-900 border-t-amber-500 rounded-full animate-spin"></div>
-                    <span class="text-slate-500 font-medium text-sm">Menghubungkan ke database...</span>
+            <div>
+                <!-- Loading State -->
+                <div id="loading-state" class="py-16 text-center">
+                    <div class="flex flex-col items-center justify-center space-y-3">
+                        <div class="w-12 h-12 border-4 border-blue-900 border-t-amber-500 rounded-full animate-spin"></div>
+                        <span class="text-slate-500 font-medium text-sm">Menghubungkan ke database...</span>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Empty State -->
+                <!-- Empty State -->
                 <div id="empty-state" class="hidden py-16 text-center bg-white rounded-2xl border border-slate-100 shadow-sm">
                     <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
                         <i class="fa-solid fa-users-slash text-2xl"></i>
@@ -333,7 +373,7 @@
                 </div>
 
                 <!-- Card Grid Container -->
-                <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
                     <!-- Kartu data camaba di-render di sini secara dinamis -->
                 </div>
             </div>
@@ -342,13 +382,13 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-sm py-8 mt-auto border-t border-slate-800">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+    <footer class="bg-slate-900 text-slate-400 text-sm py-6 sm:py-8 mt-auto border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-center sm:text-left">
             <div>
-                <p class="font-bold text-slate-200">TemanSe-Sehat UNNES &copy; 2026</p>
-                <p class="text-xs text-slate-500 mt-1">Sistem informasi koordinasi dan silaturahmi Calon Mahasiswa Baru UNNES.</p>
+                <p class="font-bold text-slate-200 text-sm sm:text-base">TemanSe-Sehat UNNES &copy; 2026</p>
+                <p class="text-[10px] sm:text-xs text-slate-500 mt-1">Sistem informasi koordinasi dan silaturahmi Calon Mahasiswa Baru UNNES.</p>
             </div>
-            <div class="text-xs text-slate-500">
+            <div class="text-[10px] sm:text-xs text-slate-500">
                 Data divalidasi mandiri oleh pendaftar.
             </div>
         </div>
@@ -542,19 +582,38 @@
         function switchTab(tabName) {
             const tabDaftar = document.getElementById('tab-daftar');
             const tabPantau = document.getElementById('tab-pantau');
+            
+            // Desktop buttons
             const btnDaftar = document.getElementById('btn-tab-daftar');
             const btnPantau = document.getElementById('btn-tab-pantau');
+            
+            // Mobile buttons
+            const btnDaftarMob = document.getElementById('btn-tab-daftar-mobile');
+            const btnPantauMob = document.getElementById('btn-tab-pantau-mobile');
 
             if (tabName === 'daftar') {
                 tabDaftar.classList.remove('hidden');
                 tabPantau.classList.add('hidden');
-                btnDaftar.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnPantau.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+                
+                // Desktop active
+                btnDaftar.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnPantau.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+                
+                // Mobile active
+                btnDaftarMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnPantauMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white";
             } else {
                 tabDaftar.classList.add('hidden');
                 tabPantau.classList.remove('hidden');
-                btnPantau.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnDaftar.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+                
+                // Desktop active
+                btnPantau.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnDaftar.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+                
+                // Mobile active
+                btnPantauMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnDaftarMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white";
+                
                 fetchData();
             }
         }
@@ -688,7 +747,7 @@
 
             dataList.forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden";
+                card.className = "bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden";
                 
                 // Hiasan aksen UNNES
                 const accentBorder = document.createElement('div');
@@ -710,7 +769,7 @@
 
                 const kodeTampilanSesi = item.kodeSesi || "?";
 
-                // 🔥 PERBAIKAN: Logika berdasarkan jenisKontak dari database
+                // Logika berdasarkan jenisKontak dari database
                 if (jenisKontak === 'Telegram') {
                     const teleUsername = cleanContact || rawContact;
                     contactBtnHtml = `
@@ -750,7 +809,7 @@
                         <div class="flex items-start justify-between gap-2 mb-3">
                             <div class="max-w-[70%]">
                                 <h3 class="font-bold text-slate-900 text-sm leading-tight">${item.nama || 'Tidak Diketahui'}</h3>
-                                <p class="text-xs text-blue-900 font-semibold mt-0.5">${item.prodi || '-'}</p>
+                                <p class="text-xs text-blue-900 font-semibold mt-0.5 truncate">${item.prodi || '-'}</p>
                                 <span class="inline-block bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-bold mt-1 uppercase">${item.fakultas || '-'}</span>
                             </div>
                             <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
@@ -765,11 +824,11 @@
                         <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs border border-slate-100 mt-2">
                             <div class="flex items-center text-slate-600">
                                 <i class="fa-regular fa-calendar-days text-slate-400 mr-2 text-sm w-4 text-center"></i>
-                                <span class="font-semibold text-slate-700">${formatDateIndo(item.tanggal)}</span>
+                                <span class="font-semibold text-slate-700 text-xs sm:text-sm">${formatDateIndo(item.tanggal)}</span>
                             </div>
                             <div class="flex items-center text-slate-600">
                                 <i class="fa-regular fa-clock text-slate-400 mr-2 text-sm w-4 text-center"></i>
-                                <span class="font-medium text-slate-600">${jamSesi || 'Waktu tidak tersedia'} WIB</span>
+                                <span class="font-medium text-slate-600 text-xs sm:text-sm">${jamSesi || 'Waktu tidak tersedia'} WIB</span>
                             </div>
                         </div>
                     </div>
@@ -797,28 +856,28 @@
             statsContainer.innerHTML = `
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
                     <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-users"></i></div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total Peserta</div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</div>
                     <div class="text-base font-extrabold text-slate-900 mt-0.5">${total} <span class="text-xs font-normal text-slate-400">Camaba</span></div>
                 </div>
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
                     <div class="bg-amber-100 text-amber-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-sun"></i></div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 1</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s1} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s1} <span class="text-xs font-normal text-slate-400">Org</span></div>
                 </div>
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
                     <div class="bg-sky-100 text-sky-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-sun"></i></div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 2</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s2} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s2} <span class="text-xs font-normal text-slate-400">Org</span></div>
                 </div>
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
                     <div class="bg-purple-100 text-purple-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-moon"></i></div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 3</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s3} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s3} <span class="text-xs font-normal text-slate-400">Org</span></div>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center col-span-2 md:col-span-1">
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center col-span-2 sm:col-span-1">
                     <div class="bg-teal-100 text-teal-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-moon"></i></div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 4</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s4} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s4} <span class="text-xs font-normal text-slate-400">Org</span></div>
                 </div>
             `;
         }
