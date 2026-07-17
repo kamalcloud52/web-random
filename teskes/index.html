@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cari Teman Tes Kesehatan - Camaba UNNES</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b-4 border-amber-500">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500 text-blue-950 p-2.5 rounded-xl shadow-md font-bold">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div class="text-center sm:text-left">
+                    <h1 class="text-xl font-bold tracking-tight flex items-center justify-center sm:justify-start gap-2">
+                        <span>TemanSe-Sehat UNNES</span>
+                        <span class="bg-amber-400 text-blue-950 text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase">Camaba 2026</span>
+                    </h1>
+                    <p class="text-xs text-slate-300">Direktori Cari Teman Tes Kesehatan Universitas Negeri Semarang</p>
+                </div>
+            </div>
+            <!-- Navigation Tabs -->
+            <div class="flex bg-blue-950/50 p-1.5 rounded-xl border border-blue-800/50">
+                <button onclick="switchTab('daftar')" id="btn-tab-daftar" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow">
+                    <i class="fa-solid fa-user-plus mr-1"></i> Isi Data Poling
+                </button>
+                <button onclick="switchTab('pantau')" id="btn-tab-pantau" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
+                    <i class="fa-solid fa-users mr-1"></i> Cari Teman
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
+        
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-start space-x-3.5">
+                <div class="bg-blue-600 text-white p-2 rounded-lg mt-1 hidden sm:block">
+                    <i class="fa-solid fa-bullhorn text-sm"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-blue-950 text-base">Cari Teman Seperjuangan Tes Kesehatan UNNES!</h3>
+                    <p class="text-sm text-blue-800 mt-0.5 leading-relaxed">
+                        Masukkan jadwal tes kesehatanmu mulai tanggal <strong>1 s.d 10 Agustus 2026</strong>. Saling sapa, koordinasi berangkat bareng, atau buat grup komunikasi agar tidak sendirian saat di lokasi tes kesehatan UNNES!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: FORM REGISTER POLING -->
+        <div id="tab-daftar" class="block max-w-3xl mx-auto">
+            <!-- Registration Form -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center">
+                        <i class="fa-solid fa-file-signature text-amber-500 mr-2"></i> Form Jadwal Tes Kesehatan
+                    </h2>
+                    <p class="text-xs text-slate-500">Silakan isi data diri dan jadwal tes kesehatan Anda untuk dipoling.</p>
+                </div>
+
+                <form id="formPoling" onsubmit="submitForm(event)" class="space-y-5">
+                    <!-- Nama Lengkap -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="nama">Nama Lengkap</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </span>
+                            <input type="text" id="nama" required placeholder="Masukkan nama lengkap Anda" 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Fakultas & Prodi (Dinamis UNNES) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="fakultas">Fakultas</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-school"></i>
+                                </span>
+                                <select id="fakultas" required onchange="updateProdiDropdown()"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Pilih Fakultas</option>
+                                    <option value="FIPP">FIPP (Ilmu Pendidikan & Psikologi)</option>
+                                    <option value="FBS">FBS (Bahasa dan Seni)</option>
+                                    <option value="FISIP">FISIP (Ilmu Sosial & Ilmu Politik)</option>
+                                    <option value="FMIPA">FMIPA (Matematika & IPA)</option>
+                                    <option value="FT">FT (Teknik)</option>
+                                    <option value="FIK">FIK (Ilmu Keolahragaan)</option>
+                                    <option value="FEB">FEB (Ekonomika dan Bisnis)</option>
+                                    <option value="FH">FH (Hukum)</option>
+                                    <option value="FK">FK (Kedokteran)</option>
+                                    <option value="Pascasarjana">Sekolah Pascasarjana</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="prodi">Program Studi (Prodi)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-book-bookmark"></i>
+                                </span>
+                                <select id="prodi" required disabled
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer disabled:opacity-60">
+                                    <option value="" disabled selected>Pilih Fakultas Terlebih Dahulu</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tanggal & Sesi -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="tanggal">Tanggal Tes (1-10 Agustus 2026)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                </span>
+                                <select id="tanggal" required onchange="generateSessionCodePreview()"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Pilih Tanggal</option>
+                                    <option value="2026-08-01">1 Agustus 2026</option>
+                                    <option value="2026-08-02">2 Agustus 2026</option>
+                                    <option value="2026-08-03">3 Agustus 2026</option>
+                                    <option value="2026-08-04">4 Agustus 2026</option>
+                                    <option value="2026-08-05">5 Agustus 2026</option>
+                                    <option value="2026-08-06">6 Agustus 2026</option>
+                                    <option value="2026-08-07">7 Agustus 2026</option>
+                                    <option value="2026-08-08">8 Agustus 2026</option>
+                                    <option value="2026-08-09">9 Agustus 2026</option>
+                                    <option value="2026-08-10">10 Agustus 2026</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="sesi">Sesi Tes Kesehatan</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-clock"></i>
+                                </span>
+                                <select id="sesi" required onchange="generateSessionCodePreview()"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Pilih Sesi</option>
+                                    <option value="Sesi 1">Sesi 1 (08.00 - 10.00 WIB)</option>
+                                    <option value="Sesi 2">Sesi 2 (10.00 - 11.30 WIB)</option>
+                                    <option value="Sesi 3">Sesi 3 (13.00 - 15.00 WIB)</option>
+                                    <option value="Sesi 4">Sesi 4 (15.00 - 16.30 WIB)</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                            <p id="session-code-preview" class="text-[11px] text-blue-600 font-bold mt-1.5 hidden"></p>
+                        </div>
+                    </div>
+
+                    <!-- Kontak Medsos/Chat -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="jenis-kontak">Tipe Kontak</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-address-card"></i>
+                                </span>
+                                <select id="jenis-kontak" required onchange="updateContactPlaceholder()"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm appearance-none cursor-pointer">
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="Telegram">Telegram</option>
+                                    <option value="Instagram">Instagram</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" for="kontak" id="label-kontak">Nomor WhatsApp</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400" id="icon-kontak">
+                                    <i class="fa-brands fa-whatsapp text-lg text-emerald-500"></i>
+                                </span>
+                                <input type="text" id="kontak" required placeholder="Contoh: 081234567890" 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all text-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Notif -->
+                    <div id="form-message" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-2">
+                        <button type="submit" id="btn-submit"
+                            class="w-full bg-gradient-to-r from-blue-900 to-indigo-950 hover:from-blue-950 hover:to-slate-900 text-white font-bold py-3.5 px-6 rounded-xl shadow-md hover:shadow-lg transition-all flex justify-center items-center space-x-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Kirim & Gabung Poling</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 2: DIREKTORI PENCARIAN TEMAN -->
+        <div id="tab-pantau" class="hidden">
+            <!-- Filter & Search Panel -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-sliders text-amber-500 mr-2"></i> Penyaringan Pencarian Teman
+                    </h2>
+                    <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
+                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                        <span>Segarkan Data</span>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Search Input -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Nama atau Prodi</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari prodi/nama..." 
+                                class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Fakultas Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Fakultas</label>
+                        <select id="filter-fakultas" onchange="applyFilters()" 
+                            class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">Semua Fakultas</option>
+                            <option value="FIPP">FIPP (Ilmu Pendidikan & Psikologi)</option>
+                            <option value="FBS">FBS (Bahasa dan Seni)</option>
+                            <option value="FISIP">FISIP (Ilmu Sosial & Ilmu Politik)</option>
+                            <option value="FMIPA">FMIPA (Matematika & IPA)</option>
+                            <option value="FT">FT (Teknik)</option>
+                            <option value="FIK">FIK (Ilmu Keolahragaan)</option>
+                            <option value="FEB">FEB (Ekonomika dan Bisnis)</option>
+                            <option value="FH">FH (Hukum)</option>
+                            <option value="FK">FK (Kedokteran)</option>
+                            <option value="Pascasarjana">Sekolah Pascasarjana</option>
+                        </select>
+                    </div>
+
+                    <!-- Tanggal Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Tanggal Tes</label>
+                        <select id="filter-tanggal" onchange="applyFilters()" 
+                            class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">Semua Tanggal (1-10 Agt)</option>
+                            <option value="2026-08-01">1 Agustus 2026</option>
+                            <option value="2026-08-02">2 Agustus 2026</option>
+                            <option value="2026-08-03">3 Agustus 2026</option>
+                            <option value="2026-08-04">4 Agustus 2026</option>
+                            <option value="2026-08-05">5 Agustus 2026</option>
+                            <option value="2026-08-06">6 Agustus 2026</option>
+                            <option value="2026-08-07">7 Agustus 2026</option>
+                            <option value="2026-08-08">8 Agustus 2026</option>
+                            <option value="2026-08-09">9 Agustus 2026</option>
+                            <option value="2026-08-10">10 Agustus 2026</option>
+                        </select>
+                    </div>
+
+                    <!-- Sesi Filter -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1.5">Sesi Tes</label>
+                        <select id="filter-sesi" onchange="applyFilters()" 
+                            class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all appearance-none cursor-pointer">
+                            <option value="">Semua Sesi</option>
+                            <option value="Sesi 1">Sesi 1 (08.00 - 10.00)</option>
+                            <option value="Sesi 2">Sesi 2 (10.00 - 11.30)</option>
+                            <option value="Sesi 3">Sesi 3 (13.00 - 15.00)</option>
+                            <option value="Sesi 4">Sesi 4 (15.00 - 16.30)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 text-center" id="stats-container">
+                <!-- Diisi otomatis melalui JS -->
+            </div>
+
+            <!-- Directory Card Grid -->
+        <div>
+            <!-- Loading State -->
+            <div id="loading-state" class="py-16 text-center">
+                <div class="flex flex-col items-center justify-center space-y-3">
+                    <div class="w-12 h-12 border-4 border-blue-900 border-t-amber-500 rounded-full animate-spin"></div>
+                    <span class="text-slate-500 font-medium text-sm">Menghubungkan ke database...</span>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+                <div id="empty-state" class="hidden py-16 text-center bg-white rounded-2xl border border-slate-100 shadow-sm">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <i class="fa-solid fa-users-slash text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-base">Tidak ada teman ditemukan</h3>
+                    <p class="text-sm text-slate-500 mt-1">Sesuaikan kembali kata kunci pencarian atau filter tanggal di atas.</p>
+                </div>
+
+                <!-- Card Grid Container -->
+                <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Kartu data camaba di-render di sini secara dinamis -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-sm py-8 mt-auto border-t border-slate-800">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <div>
+                <p class="font-bold text-slate-200">TemanSe-Sehat UNNES &copy; 2026</p>
+                <p class="text-xs text-slate-500 mt-1">Sistem informasi koordinasi dan silaturahmi Calon Mahasiswa Baru UNNES.</p>
+            </div>
+            <div class="text-xs text-slate-500">
+                Data divalidasi mandiri oleh pendaftar.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Logika Utama -->
+    <script>
+        // Ganti string di bawah ini dengan URL hasil penerapan (deploy) web app GAS Anda
+        const API_URL = "https://script.google.com/macros/s/AKfycbz_S2q5B0hD9w0K9g66Y_BqX-8H76fK-PZ34Pz5z3P5-Pz5z3P/exec"; 
+
+        let camabaList = [];
+
+        // Data Fakultas dan Program Studi Universitas Negeri Semarang (UNNES) Resmi (Sesuai unnes.ac.id/fakultas-dan-departemen/)
+        const unnesData = {
+            "FIPP": [
+                "Bimbingan dan Konseling",
+                "Teknologi Pendidikan",
+                "Pendidikan Non Formal",
+                "Psikologi",
+                "Pendidikan Guru Sekolah Dasar (PGSD)",
+                "Pendidikan Guru PAUD (PGPAUD)"
+            ],
+            "FBS": [
+                "Pendidikan Bahasa dan Sastra Indonesia",
+                "Sastra Indonesia",
+                "Pendidikan Bahasa Inggris",
+                "Sastra Inggris",
+                "Pendidikan Bahasa Prancis",
+                "Sastra Prancis",
+                "Pendidikan Bahasa Jawa",
+                "Sastra Jawa",
+                "Pendidikan Seni Rupa",
+                "Seni Rupa (Konsentrasi DKV/Lukis/Patung/Grafis)",
+                "Desain Komunikasi Visual (DKV)",
+                "Pendidikan Bahasa Jepang",
+                "Pendidikan Bahasa Arab",
+                "Pendidikan Bahasa Mandarin",
+                "Pendidikan Seni Drama, Tari, dan Musik (Seni Musik)",
+                "Pendidikan Seni Drama, Tari, dan Musik (Seni Tari)"
+            ],
+            "FISIP": [
+                "Pendidikan Sosiologi dan Antropologi",
+                "Pendidikan Pancasila dan Kewarganegaraan",
+                "Pendidikan Sejarah",
+                "Ilmu Sejarah",
+                "Ilmu Politik",
+                "Geografi",
+                "Pendidikan Geografi",
+                "Pendidikan Ilmu Pengetahuan Sosial",
+                "Ilmu Komunikasi"
+            ],
+            "FMIPA": [
+                "Matematika",
+                "Pendidikan Matematika",
+                "Fisika",
+                "Pendidikan Fisika",
+                "Kimia",
+                "Pendidikan Kimia",
+                "Biologi",
+                "Pendidikan Biologi",
+                "Pendidikan IPA",
+                "Teknik Informatika",
+                "Sistem Informasi",
+                "Ilmu Komputer",
+                "Ilmu Lingkungan",
+                "Statistika Terapan dan Komputasi"
+            ],
+            "FT": [
+                "Pendidikan Teknik Bangunan",
+                "Teknik Sipil",
+                "Arsitektur",
+                "Pendidikan Teknik Mesin",
+                "Teknik Mesin",
+                "Pendidikan Teknik Otomotif",
+                "Teknik Otomotif",
+                "Pendidikan Teknik Elektro",
+                "Teknik Elektro",
+                "Teknik Komputer",
+                "Pendidikan Teknik Informatika dan Komputer",
+                "Pendidikan Kesejahteraan Keluarga",
+                "Pendidikan Tata Busana",
+                "Pendidikan Tata Boga",
+                "Pendidikan Tata Kecantikan",
+                "Teknik Kimia"
+            ],
+            "FIK": [
+                "Ilmu Keolahragaan",
+                "Pendidikan Kesehatan Jasmani dan Rekreasi (PJKR)",
+                "Pendidikan Kepelatihan Olahraga",
+                "Pendidikan Jasmani Sekolah Dasar"
+            ],
+            "FEB": [
+                "Manajemen",
+                "Akuntansi",
+                "Ekonomi Pembangunan",
+                "Pendidikan Ekonomi (Pendidikan Akuntansi)",
+                "Pendidikan Ekonomi (Pendidikan Administrasi Perkantoran)",
+                "Pendidikan Ekonomi (Pendidikan Koperasi)",
+                "Ekonomi dan Keuangan Islam"
+            ],
+            "FH": [
+                "Ilmu Hukum"
+            ],
+            "FK": [
+                "Kedokteran",
+                "Gizi",
+                "Farmasi",
+                "Kesehatan Masyarakat",
+                "Keperawatan",
+                "Kedokteran Hewan"
+            ],
+            "Pascasarjana": [
+                "Pendidikan Dasar",
+                "Bimbingan dan Konseling",
+                "Manajemen Pendidikan",
+                "Penelitian dan Evaluasi Pendidikan",
+                "Pendidikan Profesi Guru (PPG)"
+            ]
+        };
+
+        // Mengganti dropdown Program Studi ketika Fakultas dipilih
+        function updateProdiDropdown() {
+            const fakultasSelect = document.getElementById('fakultas');
+            const prodiSelect = document.getElementById('prodi');
+            const selectedFakultas = fakultasSelect.value;
+
+            // Bersihkan prodi lama
+            prodiSelect.innerHTML = '<option value="" disabled selected>Pilih Program Studi</option>';
+
+            if (selectedFakultas && unnesData[selectedFakultas]) {
+                prodiSelect.disabled = false;
+                unnesData[selectedFakultas].forEach(prodi => {
+                    const option = document.createElement('option');
+                    option.value = prodi;
+                    option.textContent = prodi;
+                    prodiSelect.appendChild(option);
+                });
+            } else {
+                prodiSelect.disabled = true;
+                prodiSelect.innerHTML = '<option value="" disabled selected>Pilih Fakultas Terlebih Dahulu</option>';
+            }
+        }
+
+        // Generate Pratinjau Kode Sesi (misal: 1.1, 5.3) secara dinamis di form
+        function generateSessionCodePreview() {
+            const tanggalVal = document.getElementById('tanggal').value;
+            const sesiVal = document.getElementById('sesi').value;
+            const previewEl = document.getElementById('session-code-preview');
+
+            if (tanggalVal && sesiVal) {
+                // Ambil tanggal (hari saja, misal 05 -> 5)
+                const dateObj = new Date(tanggalVal);
+                const day = dateObj.getDate(); 
+
+                // Ambil nomor sesi dari teks "Sesi X"
+                const sessionNum = sesiVal.replace(/[^0-9]/g, "");
+
+                if (day && sessionNum) {
+                    previewEl.textContent = `⚡ Format Kode Sesi Anda: ${day}.${sessionNum}`;
+                    previewEl.classList.remove('hidden');
+                    return `${day}.${sessionNum}`;
+                }
+            }
+            previewEl.classList.add('hidden');
+            return "";
+        }
+
+        // Memperbarui placeholder dan label kontak berdasarkan tipe kontak yang dipilih
+        function updateContactPlaceholder() {
+            const type = document.getElementById('jenis-kontak').value;
+            const label = document.getElementById('label-kontak');
+            const input = document.getElementById('kontak');
+            const iconContainer = document.getElementById('icon-kontak');
+
+            if (type === 'WhatsApp') {
+                label.textContent = "Nomor WhatsApp";
+                input.placeholder = "Contoh: 081234567890";
+                iconContainer.innerHTML = '<i class="fa-brands fa-whatsapp text-lg text-emerald-500"></i>';
+            } else if (type === 'Telegram') {
+                label.textContent = "Username Telegram (Gunakan @)";
+                input.placeholder = "Contoh: @budi_unnes";
+                iconContainer.innerHTML = '<i class="fa-brands fa-telegram text-lg text-sky-500"></i>';
+            } else if (type === 'Instagram') {
+                label.textContent = "Username Instagram (Gunakan @)";
+                input.placeholder = "Contoh: @budisatoso_";
+                iconContainer.innerHTML = '<i class="fa-brands fa-instagram text-lg text-pink-500"></i>';
+            }
+        }
+
+        // Menangani pergantian Tab
+        function switchTab(tabName) {
+            const tabDaftar = document.getElementById('tab-daftar');
+            const tabPantau = document.getElementById('tab-pantau');
+            const btnDaftar = document.getElementById('btn-tab-daftar');
+            const btnPantau = document.getElementById('btn-tab-pantau');
+
+            if (tabName === 'daftar') {
+                tabDaftar.classList.remove('hidden');
+                tabPantau.classList.add('hidden');
+                btnDaftar.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnPantau.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+            } else {
+                tabDaftar.classList.add('hidden');
+                tabPantau.classList.remove('hidden');
+                btnPantau.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
+                btnDaftar.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
+                fetchData();
+            }
+        }
+
+        // Format Tanggal ke Bahasa Indonesia
+        function formatDateIndo(dateString) {
+            if (!dateString) return "-";
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = new Date(dateString);
+            return isNaN(date.getTime()) ? dateString : date.toLocaleDateString('id-ID', options);
+        }
+
+        function submitForm(e) {
+            e.preventDefault();
+
+            const btnSubmit = document.getElementById('btn-submit');
+            const messageBox = document.getElementById('form-message');
+
+            messageBox.classList.add('hidden');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i><span>Mengirim Data...</span>';
+
+            // Generate kode sesi dinamis (seperti 1.1 atau 5.3)
+            const generatedSessionCode = generateSessionCodePreview();
+
+            const payload = {
+                nama: document.getElementById('nama').value.trim(),
+                fakultas: document.getElementById('fakultas').value,
+                prodi: document.getElementById('prodi').value,
+                tanggal: document.getElementById('tanggal').value,
+                sesi: document.getElementById('sesi').value, // Sesi asli ("Sesi 1")
+                kodeSesi: generatedSessionCode,            // Kode dinamis ("1.1")
+                jenisKontak: document.getElementById('jenis-kontak').value,
+                kontak: document.getElementById('kontak').value.trim()
+            };
+
+            // Menggunakan fetch POST ke API GAS
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors", // No-cors mode agar bypass CORS limits di server-side redirect GAS
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Kirim & Gabung Poling</span>';
+                
+                // Beri notifikasi sukses
+                messageBox.className = "p-4 rounded-xl text-sm font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200 block";
+                messageBox.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i>Berhasil! Data Anda disimpan. Mengalihkan ke tab direktori teman...';
+                
+                document.getElementById('formPoling').reset();
+                document.getElementById('prodi').disabled = true;
+                document.getElementById('session-code-preview').classList.add('hidden');
+
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                    switchTab('pantau');
+                }, 2000);
+            })
+            .catch(err => {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i><span>Kirim & Gabung Poling</span>';
+                messageBox.className = "p-4 rounded-xl text-sm font-semibold bg-red-100 text-red-800 border border-red-200 block";
+                messageBox.innerHTML = '<i class="fa-solid fa-exclamation-triangle mr-2"></i>Gagal mengirim data. Silakan coba sesaat lagi.';
+                console.error(err);
+            });
+        }
+
+        // Ambil data direktori dari spreadsheet
+        function fetchData() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            refreshIcon.classList.add('animate-spin');
+
+            const loadingState = document.getElementById('loading-state');
+            const emptyState = document.getElementById('empty-state');
+            const cardsContainer = document.getElementById('cards-container');
+
+            loadingState.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            cardsContainer.innerHTML = '';
+
+            if (!API_URL || API_URL.includes("AKfycbz_S2q5B0hD9w0K9g66Y_BqX-8H76fK-PZ34Pz5z3P5-Pz5z3P")) {
+                setTimeout(() => {
+                    refreshIcon.classList.remove('animate-spin');
+                    loadingState.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    console.warn("API URL Google Apps Script belum diset dengan benar.");
+                }, 1000);
+                return;
+            }
+
+            fetch(API_URL + "?action=read")
+                .then(response => response.json())
+                .then(res => {
+                    refreshIcon.classList.remove('animate-spin');
+                    loadingState.classList.add('hidden');
+                    
+                    if (res.status === "success") {
+                        camabaList = res.data;
+                        renderCards(camabaList);
+                        renderStats(camabaList);
+                    } else {
+                        emptyState.classList.remove('hidden');
+                        console.error("Gagal mendapatkan data:", res.message);
+                    }
+                })
+                .catch(err => {
+                    refreshIcon.classList.remove('animate-spin');
+                    loadingState.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    console.error("Kesalahan koneksi API:", err);
+                });
+        }
+
+        // Merender kartu camaba ke antarmuka pengguna
+        function renderCards(dataList) {
+            const cardsContainer = document.getElementById('cards-container');
+            const emptyState = document.getElementById('empty-state');
+
+            cardsContainer.innerHTML = '';
+
+            if (dataList.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            dataList.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden";
+                
+                // Hiasan aksen UNNES
+                const accentBorder = document.createElement('div');
+                accentBorder.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-amber-500";
+                card.appendChild(accentBorder);
+
+                // Setup tombol kontak pintar
+                let contactBtnHtml = '';
+                const rawContact = item.kontak.trim();
+                const cleanContact = rawContact.replace("@", "");
+                const jenisKontak = item.jenisKontak || 'WhatsApp';
+
+                // Hitung jam berdasarkan Sesi
+                let jamSesi = "";
+                if (item.sesi.includes("1")) jamSesi = "08.00 - 10.00";
+                else if (item.sesi.includes("2")) jamSesi = "10.00 - 11.30";
+                else if (item.sesi.includes("3")) jamSesi = "13.00 - 15.00";
+                else if (item.sesi.includes("4")) jamSesi = "15.00 - 16.30";
+
+                const kodeTampilanSesi = item.kodeSesi || "?";
+
+                if (jenisKontak === 'Telegram' || rawContact.startsWith("@")) {
+                    contactBtnHtml = `
+                        <a href="https://t.me/${cleanContact}" target="_blank" class="mt-4 bg-sky-100 hover:bg-sky-200 text-sky-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
+                            <i class="fa-brands fa-telegram text-base"></i> <span>Hubungi via Telegram</span>
+                        </a>
+                    `;
+                } else if (jenisKontak === 'Instagram') {
+                    contactBtnHtml = `
+                        <a href="https://instagram.com/${cleanContact}" target="_blank" class="mt-4 bg-pink-100 hover:bg-pink-200 text-pink-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
+                            <i class="fa-brands fa-instagram text-base"></i> <span>Hubungi via Instagram</span>
+                        </a>
+                    `;
+                } else {
+                    // WhatsApp
+                    let waNum = rawContact.replace(/[^0-9]/g, "");
+                    if (waNum.startsWith("0")) waNum = "62" + waNum.slice(1);
+                    const waText = encodeURIComponent(`Halo ${item.nama}, aku sesama camaba UNNES. Aku lihat jadwal tes kesehatanmu di poling tanggal ${formatDateIndo(item.tanggal)} - Kode Sesi ${kodeTampilanSesi} (${jamSesi} WIB). Mau koordinasi atau berangkat bareng?`);
+                    
+                    contactBtnHtml = `
+                        <a href="https://wa.me/${waNum}?text=${waText}" target="_blank" class="mt-4 bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 px-4 rounded-xl text-xs font-bold flex items-center justify-center space-x-2 transition-all shadow-sm">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> <span>Hubungi via WhatsApp</span>
+                        </a>
+                    `;
+                }
+
+                // Sesi Badge Styles
+                let sessionBadgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+                if (item.sesi.includes("2")) sessionBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
+                if (item.sesi.includes("3")) sessionBadgeClass = "bg-purple-100 text-purple-800 border-purple-200";
+                if (item.sesi.includes("4")) sessionBadgeClass = "bg-teal-100 text-teal-800 border-teal-200";
+
+                card.innerHTML += `
+                    <div>
+                        <!-- Info Profil Camaba -->
+                        <div class="flex items-start justify-between gap-2 mb-3">
+                            <div class="max-w-[70%]">
+                                <h3 class="font-bold text-slate-900 text-sm leading-tight">${item.nama}</h3>
+                                <p class="text-xs text-blue-900 font-semibold mt-0.5">${item.prodi}</p>
+                                <span class="inline-block bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-bold mt-1 uppercase">${item.fakultas}</span>
+                            </div>
+                            <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
+                                <span class="inline-flex items-center px-2 py-0.5 border rounded-lg text-[10px] font-extrabold ${sessionBadgeClass}">
+                                    Kode: ${kodeTampilanSesi}
+                                </span>
+                                <span class="text-[9px] text-slate-400 font-medium">Sesi ${item.sesi.replace(/[^0-9]/g, "")}</span>
+                            </div>
+                        </div>
+
+                        <!-- Info Jadwal Tes -->
+                        <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs border border-slate-100 mt-2">
+                            <div class="flex items-center text-slate-600">
+                                <i class="fa-regular fa-calendar-days text-slate-400 mr-2 text-sm w-4 text-center"></i>
+                                <span class="font-semibold text-slate-700">${formatDateIndo(item.tanggal)}</span>
+                            </div>
+                            <div class="flex items-center text-slate-600">
+                                <i class="fa-regular fa-clock text-slate-400 mr-2 text-sm w-4 text-center"></i>
+                                <span class="font-medium text-slate-600">${jamSesi} WIB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Kontak -->
+                    ${contactBtnHtml}
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // Menghitung statistik per sesi untuk dicantumkan pada dashboard pencarian
+        function renderStats(dataList) {
+            const statsContainer = document.getElementById('stats-container');
+            const total = dataList.length;
+
+            let s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+            dataList.forEach(item => {
+                if (item.sesi.includes("1")) s1++;
+                else if (item.sesi.includes("2")) s2++;
+                else if (item.sesi.includes("3")) s3++;
+                else if (item.sesi.includes("4")) s4++;
+            });
+
+            statsContainer.innerHTML = `
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
+                    <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-users"></i></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total Peserta</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${total} <span class="text-xs font-normal text-slate-400">Camaba</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
+                    <div class="bg-amber-100 text-amber-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-sun"></i></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 1</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s1} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
+                    <div class="bg-sky-100 text-sky-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-sun"></i></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 2</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s2} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
+                    <div class="bg-purple-100 text-purple-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-moon"></i></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 3</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s3} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                </div>
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center col-span-2 md:col-span-1">
+                    <div class="bg-teal-100 text-teal-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-moon"></i></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 4</div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s4} <span class="text-xs font-normal text-slate-400">Orang</span></div>
+                </div>
+            `;
+        }
+
+        // Melakukan filter pencarian interaktif di sisi klien
+        function applyFilters() {
+            const fSearch = document.getElementById('filter-search').value.toLowerCase();
+            const fFakultas = document.getElementById('filter-fakultas').value;
+            const fTanggal = document.getElementById('filter-tanggal').value;
+            const fSesi = document.getElementById('filter-sesi').value;
+
+            const filteredData = camabaList.filter(item => {
+                const matchSearch = !fSearch || 
+                    item.nama.toLowerCase().includes(fSearch) || 
+                    item.prodi.toLowerCase().includes(fSearch) ||
+                    (item.kodeSesi && item.kodeSesi.includes(fSearch));
+                const matchFakultas = !fFakultas || item.fakultas === fFakultas;
+                const matchTanggal = !fTanggal || item.tanggal === fTanggal;
+                const matchSesi = !fSesi || item.sesi.includes(fSesi);
+
+                return matchSearch && matchFakultas && matchTanggal && matchSesi;
+            });
+
+            renderCards(filteredData);
+        }
+
+        // Eksekusi inisiasi pertama
+        window.onload = function() {
+            updateContactPlaceholder();
+        };
+    </script>
+</body>
+</html>
