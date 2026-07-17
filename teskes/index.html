@@ -363,12 +363,12 @@
 
     <!-- Script Logika Utama -->
     <script>
-        // Ganti string di bawah ini dengan URL hasil penerapan (deploy) web app GAS Anda
+        // 🔥 UPDATE: Ganti dengan URL deploy GAS Anda yang SEBENARNYA
         const API_URL = "https://script.google.com/macros/s/AKfycbz9TPf6VGmOJi0hM9T1SML_gG1yzCzuh00xnQV7Pateg7BuQt5ovvcDZwGMOdNgdwB2zw/exec"; 
 
         let camabaList = [];
 
-        // Data Fakultas dan Program Studi Universitas Negeri Semarang (UNNES) Resmi (Sesuai unnes.ac.id/fakultas-dan-departemen/)
+        // Data Fakultas dan Program Studi Universitas Negeri Semarang (UNNES) Resmi
         const unnesData = {
             "FIPP": [
                 "Bimbingan dan Konseling",
@@ -476,13 +476,11 @@
             ]
         };
 
-        // Mengganti dropdown Program Studi ketika Fakultas dipilih
         function updateProdiDropdown() {
             const fakultasSelect = document.getElementById('fakultas');
             const prodiSelect = document.getElementById('prodi');
             const selectedFakultas = fakultasSelect.value;
 
-            // Bersihkan prodi lama
             prodiSelect.innerHTML = '<option value="" disabled selected>Pilih Program Studi</option>';
 
             if (selectedFakultas && unnesData[selectedFakultas]) {
@@ -499,18 +497,14 @@
             }
         }
 
-        // Generate Pratinjau Kode Sesi (misal: 1.1, 5.3) secara dinamis di form
         function generateSessionCodePreview() {
             const tanggalVal = document.getElementById('tanggal').value;
             const sesiVal = document.getElementById('sesi').value;
             const previewEl = document.getElementById('session-code-preview');
 
             if (tanggalVal && sesiVal) {
-                // Ambil tanggal (hari saja, misal 05 -> 5)
                 const dateObj = new Date(tanggalVal);
                 const day = dateObj.getDate(); 
-
-                // Ambil nomor sesi dari teks "Sesi X"
                 const sessionNum = sesiVal.replace(/[^0-9]/g, "");
 
                 if (day && sessionNum) {
@@ -523,7 +517,6 @@
             return "";
         }
 
-        // Memperbarui placeholder dan label kontak berdasarkan tipe kontak yang dipilih
         function updateContactPlaceholder() {
             const type = document.getElementById('jenis-kontak').value;
             const label = document.getElementById('label-kontak');
@@ -545,33 +538,26 @@
             }
         }
 
-        // Menangani pergantian Tab
         function switchTab(tabName) {
             const tabDaftar = document.getElementById('tab-daftar');
             const tabPantau = document.getElementById('tab-pantau');
-            
             const btnDaftar = document.getElementById('btn-tab-daftar');
             const btnPantau = document.getElementById('btn-tab-pantau');
 
             if (tabName === 'daftar') {
                 tabDaftar.classList.remove('hidden');
                 tabPantau.classList.add('hidden');
-                
                 btnDaftar.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-amber-500 text-blue-950 shadow-lg hover:shadow-xl hover:scale-105";
                 btnPantau.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-white/10 text-white hover:bg-white/20 hover:scale-105";
             } else {
                 tabDaftar.classList.add('hidden');
                 tabPantau.classList.remove('hidden');
-                
                 btnPantau.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-amber-500 text-blue-950 shadow-lg hover:shadow-xl hover:scale-105";
                 btnDaftar.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-white/10 text-white hover:bg-white/20 hover:scale-105";
-                
-                // 🔥 Fetch data setiap kali tab "Cari Teman" dibuka
                 fetchData();
             }
         }
 
-        // Format Tanggal ke Bahasa Indonesia
         function formatDateIndo(dateString) {
             if (!dateString) return "-";
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -589,7 +575,6 @@
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i><span>Mengirim Data...</span>';
 
-            // Generate kode sesi dinamis (seperti 1.1 atau 5.3)
             const generatedSessionCode = generateSessionCodePreview();
 
             const payload = {
@@ -636,7 +621,7 @@
             });
         }
 
-        // 🔥 PERBAIKAN: Ambil data direktori dari spreadsheet dengan state management yang benar
+        // 🔥 PERBAIKAN UTAMA: fetchData dengan debugging
         function fetchData() {
             const refreshIcon = document.getElementById('refresh-icon');
             refreshIcon.classList.add('animate-spin');
@@ -645,66 +630,67 @@
             const emptyState = document.getElementById('empty-state');
             const cardsContainer = document.getElementById('cards-container');
 
-            // Tampilkan loading, sembunyikan empty state
             loadingState.classList.remove('hidden');
             emptyState.classList.add('hidden');
             cardsContainer.innerHTML = '';
 
-            // Jika API_URL belum diset
-            if (!API_URL || API_URL.includes("AKfycbz_S2q5B0hD9w0K9g66Y_BqX-8H76fK-PZ34Pz5z3P5-Pz5z3P")) {
-                setTimeout(() => {
-                    refreshIcon.classList.remove('animate-spin');
-                    loadingState.classList.add('hidden');
-                    emptyState.classList.remove('hidden');
-                    document.getElementById('empty-title').textContent = 'API Belum Diset';
-                    document.getElementById('empty-desc').textContent = 'Silakan update URL API_GAS di file index.html';
-                    console.warn("API URL Google Apps Script belum diset dengan benar.");
-                }, 1000);
-                return;
-            }
+            console.log("🔍 Fetching data from:", API_URL + "?action=read");
 
             fetch(API_URL + "?action=read")
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
+                    console.log("📡 Response status:", response.status);
+                    return response.text(); // Baca sebagai text dulu
                 })
-                .then(res => {
-                    refreshIcon.classList.remove('animate-spin');
-                    loadingState.classList.add('hidden');
+                .then(text => {
+                    console.log("📄 Raw response:", text);
                     
-                    if (res.status === "success") {
-                        camabaList = res.data || [];
+                    try {
+                        const res = JSON.parse(text);
+                        console.log("✅ Parsed JSON:", res);
                         
-                        // Jika data kosong, tampilkan empty state dengan pesan yang sesuai
-                        if (camabaList.length === 0) {
-                            emptyState.classList.remove('hidden');
-                            document.getElementById('empty-title').textContent = 'Belum Ada Data';
-                            document.getElementById('empty-desc').textContent = 'Isi data di tab "Isi Data Poling" terlebih dahulu!';
+                        refreshIcon.classList.remove('animate-spin');
+                        loadingState.classList.add('hidden');
+                        
+                        if (res.status === "success") {
+                            camabaList = res.data || [];
+                            console.log("📊 Jumlah data:", camabaList.length);
+                            
+                            if (camabaList.length === 0) {
+                                emptyState.classList.remove('hidden');
+                                document.getElementById('empty-title').textContent = 'Belum Ada Data';
+                                document.getElementById('empty-desc').textContent = 'Isi data di tab "Isi Data Poling" terlebih dahulu!';
+                            } else {
+                                emptyState.classList.add('hidden');
+                                renderCards(camabaList);
+                                renderStats(camabaList);
+                            }
                         } else {
-                            emptyState.classList.add('hidden');
-                            renderCards(camabaList);
-                            renderStats(camabaList);
+                            emptyState.classList.remove('hidden');
+                            document.getElementById('empty-title').textContent = 'Gagal Memuat Data';
+                            document.getElementById('empty-desc').textContent = res.message || 'Silakan coba lagi nanti.';
+                            console.error("❌ Gagal mendapatkan data:", res.message);
                         }
-                    } else {
+                    } catch (parseError) {
+                        console.error("❌ Gagal parse JSON:", parseError);
+                        console.log("📄 Response yang diterima:", text);
                         emptyState.classList.remove('hidden');
-                        document.getElementById('empty-title').textContent = 'Gagal Memuat Data';
-                        document.getElementById('empty-desc').textContent = res.message || 'Silakan coba lagi nanti.';
-                        console.error("Gagal mendapatkan data:", res.message);
+                        document.getElementById('empty-title').textContent = 'Error Parse Data';
+                        document.getElementById('empty-desc').textContent = 'Response dari server tidak valid. Cek console untuk detail.';
+                        refreshIcon.classList.remove('animate-spin');
+                        loadingState.classList.add('hidden');
                     }
                 })
                 .catch(err => {
+                    console.error("❌ Error koneksi:", err);
                     refreshIcon.classList.remove('animate-spin');
                     loadingState.classList.add('hidden');
                     emptyState.classList.remove('hidden');
                     document.getElementById('empty-title').textContent = 'Koneksi Gagal';
-                    document.getElementById('empty-desc').textContent = 'Periksa koneksi internet Anda dan coba refresh.';
-                    console.error("Kesalahan koneksi API:", err);
+                    document.getElementById('empty-desc').textContent = 'Periksa koneksi internet dan pastikan URL GAS benar.';
                 });
         }
 
-        // 🔥 PERBAIKAN: Merender kartu camaba dengan handling empty state yang benar
+        // 🔥 PERBAIKAN: renderCards dengan data yang benar
         function renderCards(dataList) {
             const cardsContainer = document.getElementById('cards-container');
             const emptyState = document.getElementById('empty-state');
@@ -806,7 +792,6 @@
             });
         }
 
-        // Menghitung statistik per sesi
         function renderStats(dataList) {
             const statsContainer = document.getElementById('stats-container');
             const total = dataList.length;
@@ -848,7 +833,6 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter pencarian interaktif
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
@@ -876,7 +860,6 @@
             renderCards(filteredData);
         }
 
-        // Eksekusi inisiasi pertama
         window.onload = function() {
             updateContactPlaceholder();
         };
