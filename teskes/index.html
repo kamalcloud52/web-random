@@ -13,72 +13,40 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        /* Animasi smooth untuk tab button */
         .tab-btn {
             transition: all 0.3s ease;
-        }
-        /* Header mobile improvement */
-        @media (max-width: 640px) {
-            .header-title {
-                font-size: 0.9rem;
-            }
-            .header-subtitle {
-                font-size: 0.65rem;
-            }
-            .header-logo {
-                padding: 0.5rem;
-                font-size: 0.8rem;
-            }
-            .tab-btn {
-                padding: 0.4rem 0.6rem;
-                font-size: 0.6rem;
-            }
-            .tab-btn i {
-                font-size: 0.7rem;
-            }
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header yang sudah diperbaiki untuk mobile & desktop -->
+    <!-- HEADER BARU: Judul Full Lebar, Tombol Tab di Bawah -->
     <header class="bg-gradient-to-r from-blue-900 to-indigo-950 text-white shadow-lg sticky top-0 z-50 border-b-4 border-amber-500">
-        <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
-            <!-- Baris 1: Logo & Judul -->
-            <div class="flex flex-row items-center justify-between gap-2">
-                <!-- Logo & Judul -->
-                <div class="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-                    <div class="header-logo bg-amber-500 text-blue-950 p-1.5 sm:p-2.5 rounded-xl shadow-md font-bold flex-shrink-0">
-                        <i class="fa-solid fa-graduation-cap text-base sm:text-xl"></i>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <h1 class="header-title text-sm sm:text-xl font-bold tracking-tight flex items-center gap-1 sm:gap-2 flex-wrap">
-                            <span class="truncate">TemanSe-Sehat UNNES</span>
-                            <span class="bg-amber-400 text-blue-950 text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full font-extrabold uppercase flex-shrink-0">Camaba 2026</span>
-                        </h1>
-                        <p class="header-subtitle text-[10px] sm:text-xs text-slate-300 truncate hidden xs:block">Direktori Cari Teman Tes Kesehatan UNNES</p>
-                    </div>
+        <!-- Baris 1: Logo & Judul Full -->
+        <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+            <div class="flex items-center justify-center space-x-3 sm:space-x-4">
+                <div class="bg-amber-500 text-blue-950 p-2.5 sm:p-3 rounded-xl shadow-md font-bold flex-shrink-0">
+                    <i class="fa-solid fa-graduation-cap text-xl sm:text-2xl"></i>
                 </div>
+                <div class="text-center">
+                    <h1 class="text-lg sm:text-2xl md:text-3xl font-bold tracking-tight flex items-center justify-center gap-2 flex-wrap">
+                        <span>TemanSe-Sehat UNNES</span>
+                        <span class="bg-amber-400 text-blue-950 text-[10px] sm:text-xs px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full font-extrabold uppercase">Camaba 2026</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-300 mt-0.5">Direktori Cari Teman Tes Kesehatan Universitas Negeri Semarang</p>
+                </div>
+            </div>
+        </div>
 
-                <!-- Tombol Tab versi mobile (hanya icon) -->
-                <div class="flex sm:hidden bg-blue-950/50 p-1 rounded-xl border border-blue-800/50 gap-1 flex-shrink-0">
-                    <button onclick="switchTab('daftar')" id="btn-tab-daftar-mobile" class="tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow">
-                        <i class="fa-solid fa-pen-to-square text-xs"></i>
-                    </button>
-                    <button onclick="switchTab('pantau')" id="btn-tab-pantau-mobile" class="tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white">
-                        <i class="fa-solid fa-users text-xs"></i>
-                    </button>
-                </div>
-
-                <!-- Tombol Tab versi desktop -->
-                <div class="hidden sm:flex bg-blue-950/50 p-1.5 rounded-xl border border-blue-800/50 flex-shrink-0">
-                    <button onclick="switchTab('daftar')" id="btn-tab-daftar" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow">
-                        <i class="fa-solid fa-user-plus mr-1"></i> Isi Data Poling
-                    </button>
-                    <button onclick="switchTab('pantau')" id="btn-tab-pantau" class="tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white">
-                        <i class="fa-solid fa-users mr-1"></i> Cari Teman
-                    </button>
-                </div>
+        <!-- Baris 2: Tombol Tab (di bawah header) -->
+        <div class="bg-blue-950/30 border-t border-blue-800/30">
+            <div class="max-w-6xl mx-auto px-4 py-2 sm:py-2.5 flex justify-center gap-2 sm:gap-3">
+                <button onclick="switchTab('daftar')" id="btn-tab-daftar" class="tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-amber-500 text-blue-950 shadow-lg hover:shadow-xl hover:scale-105">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Isi Data Poling
+                </button>
+                <button onclick="switchTab('pantau')" id="btn-tab-pantau" class="tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-white/10 text-white hover:bg-white/20 hover:scale-105">
+                    <i class="fa-solid fa-users mr-2"></i> Cari Teman
+                </button>
             </div>
         </div>
     </header>
@@ -586,33 +554,19 @@
             // Desktop buttons
             const btnDaftar = document.getElementById('btn-tab-daftar');
             const btnPantau = document.getElementById('btn-tab-pantau');
-            
-            // Mobile buttons
-            const btnDaftarMob = document.getElementById('btn-tab-daftar-mobile');
-            const btnPantauMob = document.getElementById('btn-tab-pantau-mobile');
 
             if (tabName === 'daftar') {
                 tabDaftar.classList.remove('hidden');
                 tabPantau.classList.add('hidden');
                 
-                // Desktop active
-                btnDaftar.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnPantau.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
-                
-                // Mobile active
-                btnDaftarMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnPantauMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white";
+                btnDaftar.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-amber-500 text-blue-950 shadow-lg hover:shadow-xl hover:scale-105";
+                btnPantau.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-white/10 text-white hover:bg-white/20 hover:scale-105";
             } else {
                 tabDaftar.classList.add('hidden');
                 tabPantau.classList.remove('hidden');
                 
-                // Desktop active
-                btnPantau.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnDaftar.className = "tab-btn px-3 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-300 hover:text-white";
-                
-                // Mobile active
-                btnPantauMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-blue-950 shadow";
-                btnDaftarMob.className = "tab-btn px-2 py-1.5 rounded-lg font-bold transition-all text-slate-300 hover:text-white";
+                btnPantau.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-amber-500 text-blue-950 shadow-lg hover:shadow-xl hover:scale-105";
+                btnDaftar.className = "tab-btn px-5 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all bg-white/10 text-white hover:bg-white/20 hover:scale-105";
                 
                 fetchData();
             }
