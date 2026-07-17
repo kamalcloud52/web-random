@@ -621,7 +621,7 @@
             });
         }
 
-        // 🔥 PERBAIKAN UTAMA: fetchData dengan debugging
+        // 🔥 PERBAIKAN UTAMA: fetchData dengan debugging lengkap
         function fetchData() {
             const refreshIcon = document.getElementById('refresh-icon');
             refreshIcon.classList.add('animate-spin');
@@ -634,26 +634,47 @@
             emptyState.classList.add('hidden');
             cardsContainer.innerHTML = '';
 
-            console.log("🔍 Fetching data from:", API_URL + "?action=read");
+            const url = API_URL + "?action=read";
+            console.log("🔍 Fetching from:", url);
 
-            fetch(API_URL + "?action=read")
+            fetch(url)
                 .then(response => {
                     console.log("📡 Response status:", response.status);
-                    return response.text(); // Baca sebagai text dulu
+                    console.log("📡 Response type:", response.type);
+                    return response.text();
                 })
                 .then(text => {
-                    console.log("📄 Raw response:", text);
+                    console.log("📄 Raw response length:", text.length);
+                    console.log("📄 First 200 chars:", text.substring(0, 200));
                     
+                    // Clean response
+                    let cleanText = text.trim();
+                    
+                    // Hapus BOM jika ada
+                    if (cleanText.charCodeAt(0) === 0xFEFF) {
+                        cleanText = cleanText.slice(1);
+                        console.log("📄 BOM removed");
+                    }
+                    
+                    // Cek apakah response adalah JSONP
+                    if (cleanText.startsWith('callback(') || cleanText.startsWith('handleResponse(')) {
+                        const startIdx = cleanText.indexOf('(') + 1;
+                        const endIdx = cleanText.lastIndexOf(')');
+                        cleanText = cleanText.substring(startIdx, endIdx);
+                        console.log("📄 JSONP unwrapped");
+                    }
+                    
+                    // Parse JSON
                     try {
-                        const res = JSON.parse(text);
-                        console.log("✅ Parsed JSON:", res);
+                        const json = JSON.parse(cleanText);
+                        console.log("✅ Parsed JSON:", json);
                         
                         refreshIcon.classList.remove('animate-spin');
                         loadingState.classList.add('hidden');
                         
-                        if (res.status === "success") {
-                            camabaList = res.data || [];
-                            console.log("📊 Jumlah data:", camabaList.length);
+                        if (json.status === "success") {
+                            camabaList = json.data || [];
+                            console.log("📊 Total data:", camabaList.length);
                             
                             if (camabaList.length === 0) {
                                 emptyState.classList.remove('hidden');
@@ -666,31 +687,30 @@
                             }
                         } else {
                             emptyState.classList.remove('hidden');
-                            document.getElementById('empty-title').textContent = 'Gagal Memuat Data';
-                            document.getElementById('empty-desc').textContent = res.message || 'Silakan coba lagi nanti.';
-                            console.error("❌ Gagal mendapatkan data:", res.message);
+                            document.getElementById('empty-title').textContent = 'Error Server';
+                            document.getElementById('empty-desc').textContent = json.message || 'Unknown error';
                         }
                     } catch (parseError) {
-                        console.error("❌ Gagal parse JSON:", parseError);
-                        console.log("📄 Response yang diterima:", text);
-                        emptyState.classList.remove('hidden');
-                        document.getElementById('empty-title').textContent = 'Error Parse Data';
-                        document.getElementById('empty-desc').textContent = 'Response dari server tidak valid. Cek console untuk detail.';
+                        console.error("❌ Parse error:", parseError);
+                        console.error("❌ Full response:", text);
+                        
                         refreshIcon.classList.remove('animate-spin');
                         loadingState.classList.add('hidden');
+                        emptyState.classList.remove('hidden');
+                        document.getElementById('empty-title').textContent = 'Error Parse Data';
+                        document.getElementById('empty-desc').textContent = 'Coba akses URL langsung di browser untuk cek response.';
                     }
                 })
                 .catch(err => {
-                    console.error("❌ Error koneksi:", err);
+                    console.error("❌ Fetch error:", err);
                     refreshIcon.classList.remove('animate-spin');
                     loadingState.classList.add('hidden');
                     emptyState.classList.remove('hidden');
                     document.getElementById('empty-title').textContent = 'Koneksi Gagal';
-                    document.getElementById('empty-desc').textContent = 'Periksa koneksi internet dan pastikan URL GAS benar.';
+                    document.getElementById('empty-desc').textContent = err.message || 'Cek koneksi internet.';
                 });
         }
 
-        // 🔥 PERBAIKAN: renderCards dengan data yang benar
         function renderCards(dataList) {
             const cardsContainer = document.getElementById('cards-container');
             const emptyState = document.getElementById('empty-state');
