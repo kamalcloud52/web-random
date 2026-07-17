@@ -697,33 +697,36 @@
 
                 // Setup tombol kontak pintar
                 let contactBtnHtml = '';
-                const rawContact = item.kontak.trim();
-                const cleanContact = rawContact.replace("@", "");
+                const rawContact = item.kontak ? item.kontak.trim() : '';
+                const cleanContact = rawContact.replace(/^@/, ""); // Hapus @ di depan
                 const jenisKontak = item.jenisKontak || 'WhatsApp';
 
                 // Hitung jam berdasarkan Sesi
                 let jamSesi = "";
-                if (item.sesi.includes("1")) jamSesi = "08.00 - 10.00";
-                else if (item.sesi.includes("2")) jamSesi = "10.00 - 11.30";
-                else if (item.sesi.includes("3")) jamSesi = "13.00 - 15.00";
-                else if (item.sesi.includes("4")) jamSesi = "15.00 - 16.30";
+                if (item.sesi && item.sesi.includes("1")) jamSesi = "08.00 - 10.00";
+                else if (item.sesi && item.sesi.includes("2")) jamSesi = "10.00 - 11.30";
+                else if (item.sesi && item.sesi.includes("3")) jamSesi = "13.00 - 15.00";
+                else if (item.sesi && item.sesi.includes("4")) jamSesi = "15.00 - 16.30";
 
                 const kodeTampilanSesi = item.kodeSesi || "?";
 
-                if (jenisKontak === 'Telegram' || rawContact.startsWith("@")) {
+                // 🔥 PERBAIKAN: Logika berdasarkan jenisKontak dari database
+                if (jenisKontak === 'Telegram') {
+                    const teleUsername = cleanContact || rawContact;
                     contactBtnHtml = `
-                        <a href="https://t.me/${cleanContact}" target="_blank" class="mt-4 bg-sky-100 hover:bg-sky-200 text-sky-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
+                        <a href="https://t.me/${teleUsername}" target="_blank" class="mt-4 bg-sky-100 hover:bg-sky-200 text-sky-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
                             <i class="fa-brands fa-telegram text-base"></i> <span>Hubungi via Telegram</span>
                         </a>
                     `;
                 } else if (jenisKontak === 'Instagram') {
+                    const igUsername = cleanContact || rawContact;
                     contactBtnHtml = `
-                        <a href="https://instagram.com/${cleanContact}" target="_blank" class="mt-4 bg-pink-100 hover:bg-pink-200 text-pink-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
+                        <a href="https://instagram.com/${igUsername}" target="_blank" class="mt-4 bg-pink-100 hover:bg-pink-200 text-pink-800 py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all">
                             <i class="fa-brands fa-instagram text-base"></i> <span>Hubungi via Instagram</span>
                         </a>
                     `;
                 } else {
-                    // WhatsApp
+                    // WhatsApp (default)
                     let waNum = rawContact.replace(/[^0-9]/g, "");
                     if (waNum.startsWith("0")) waNum = "62" + waNum.slice(1);
                     const waText = encodeURIComponent(`Halo ${item.nama}, aku sesama camaba UNNES. Aku lihat jadwal tes kesehatanmu di poling tanggal ${formatDateIndo(item.tanggal)} - Kode Sesi ${kodeTampilanSesi} (${jamSesi} WIB). Mau koordinasi atau berangkat bareng?`);
@@ -737,24 +740,24 @@
 
                 // Sesi Badge Styles
                 let sessionBadgeClass = "bg-amber-100 text-amber-800 border-amber-200";
-                if (item.sesi.includes("2")) sessionBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
-                if (item.sesi.includes("3")) sessionBadgeClass = "bg-purple-100 text-purple-800 border-purple-200";
-                if (item.sesi.includes("4")) sessionBadgeClass = "bg-teal-100 text-teal-800 border-teal-200";
+                if (item.sesi && item.sesi.includes("2")) sessionBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
+                if (item.sesi && item.sesi.includes("3")) sessionBadgeClass = "bg-purple-100 text-purple-800 border-purple-200";
+                if (item.sesi && item.sesi.includes("4")) sessionBadgeClass = "bg-teal-100 text-teal-800 border-teal-200";
 
                 card.innerHTML += `
                     <div>
                         <!-- Info Profil Camaba -->
                         <div class="flex items-start justify-between gap-2 mb-3">
                             <div class="max-w-[70%]">
-                                <h3 class="font-bold text-slate-900 text-sm leading-tight">${item.nama}</h3>
-                                <p class="text-xs text-blue-900 font-semibold mt-0.5">${item.prodi}</p>
-                                <span class="inline-block bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-bold mt-1 uppercase">${item.fakultas}</span>
+                                <h3 class="font-bold text-slate-900 text-sm leading-tight">${item.nama || 'Tidak Diketahui'}</h3>
+                                <p class="text-xs text-blue-900 font-semibold mt-0.5">${item.prodi || '-'}</p>
+                                <span class="inline-block bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded-md font-bold mt-1 uppercase">${item.fakultas || '-'}</span>
                             </div>
                             <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
                                 <span class="inline-flex items-center px-2 py-0.5 border rounded-lg text-[10px] font-extrabold ${sessionBadgeClass}">
                                     Kode: ${kodeTampilanSesi}
                                 </span>
-                                <span class="text-[9px] text-slate-400 font-medium">Sesi ${item.sesi.replace(/[^0-9]/g, "")}</span>
+                                <span class="text-[9px] text-slate-400 font-medium">${item.sesi ? `Sesi ${item.sesi.replace(/[^0-9]/g, "")}` : '-'}</span>
                             </div>
                         </div>
 
@@ -766,7 +769,7 @@
                             </div>
                             <div class="flex items-center text-slate-600">
                                 <i class="fa-regular fa-clock text-slate-400 mr-2 text-sm w-4 text-center"></i>
-                                <span class="font-medium text-slate-600">${jamSesi} WIB</span>
+                                <span class="font-medium text-slate-600">${jamSesi || 'Waktu tidak tersedia'} WIB</span>
                             </div>
                         </div>
                     </div>
@@ -785,10 +788,10 @@
 
             let s1 = 0, s2 = 0, s3 = 0, s4 = 0;
             dataList.forEach(item => {
-                if (item.sesi.includes("1")) s1++;
-                else if (item.sesi.includes("2")) s2++;
-                else if (item.sesi.includes("3")) s3++;
-                else if (item.sesi.includes("4")) s4++;
+                if (item.sesi && item.sesi.includes("1")) s1++;
+                else if (item.sesi && item.sesi.includes("2")) s2++;
+                else if (item.sesi && item.sesi.includes("3")) s3++;
+                else if (item.sesi && item.sesi.includes("4")) s4++;
             });
 
             statsContainer.innerHTML = `
@@ -829,12 +832,12 @@
 
             const filteredData = camabaList.filter(item => {
                 const matchSearch = !fSearch || 
-                    item.nama.toLowerCase().includes(fSearch) || 
-                    item.prodi.toLowerCase().includes(fSearch) ||
+                    (item.nama && item.nama.toLowerCase().includes(fSearch)) || 
+                    (item.prodi && item.prodi.toLowerCase().includes(fSearch)) ||
                     (item.kodeSesi && item.kodeSesi.includes(fSearch));
-                const matchFakultas = !fFakultas || item.fakultas === fFakultas;
-                const matchTanggal = !fTanggal || item.tanggal === fTanggal;
-                const matchSesi = !fSesi || item.sesi.includes(fSesi);
+                const matchFakultas = !fFakultas || (item.fakultas === fFakultas);
+                const matchTanggal = !fTanggal || (item.tanggal === fTanggal);
+                const matchSesi = !fSesi || (item.sesi && item.sesi.includes(fSesi));
 
                 return matchSearch && matchFakultas && matchTanggal && matchSesi;
             });
