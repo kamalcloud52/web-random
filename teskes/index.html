@@ -818,18 +818,16 @@
             const statsContainer = document.getElementById('stats-container');
             const total = dataList.length;
         
-            // 🔥 Hitung jumlah per tanggal (1-10 Agustus 2026)
+            // Hitung jumlah per tanggal (1-10 Agustus 2026)
             const dateCounts = {};
             const dateLabels = {};
             
-            // Inisialisasi semua tanggal 1-10 Agustus 2026
             for (let d = 1; d <= 10; d++) {
                 const dateStr = '2026-08-' + String(d).padStart(2, '0');
                 dateCounts[dateStr] = 0;
                 dateLabels[dateStr] = d + ' Agt';
             }
         
-            // Hitung data per tanggal
             dataList.forEach(item => {
                 if (item.tanggal) {
                     const tanggal = item.tanggal.substring(0, 10);
@@ -839,18 +837,16 @@
                 }
             });
         
-            // 🔥 Buat HTML untuk statistik
             let statsHtml = `
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center min-w-[100px] flex-shrink-0">
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center min-w-[90px] flex-shrink-0">
                     <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm">
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${total} <span class="text-xs font-normal text-slate-400">Camaba</span></div>
+                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${total}</div>
                 </div>
             `;
         
-            // Loop untuk setiap tanggal
             const dateKeys = Object.keys(dateCounts).sort();
             dateKeys.forEach(dateStr => {
                 const count = dateCounts[dateStr];
@@ -874,20 +870,22 @@
                             <i class="${icon} ${iconColor}"></i>
                         </div>
                         <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">${label}</div>
-                        <div class="text-base font-extrabold ${textColor} mt-0.5">${count} <span class="text-xs font-normal text-slate-400">Org</span></div>
+                        <div class="text-base font-extrabold ${textColor} mt-0.5">${count}</div>
                     </div>
                 `;
             });
         
-            // Bungkus dengan container horizontal scrollable
+            // 🔥 PERBAIKAN: Container full width dengan overflow-x-auto
             statsContainer.innerHTML = `
-                <div class="overflow-x-auto pb-2 scroll-smooth">
-                    <div class="flex gap-3 sm:gap-4" style="min-width: max-content;">
+                <div class="w-full overflow-x-auto overflow-y-hidden pb-3 -mx-1 px-1">
+                    <div class="flex gap-3" style="width: max-content; min-width: 100%;">
                         ${statsHtml}
                     </div>
                 </div>
-                <div class="flex justify-center gap-1 mt-2 sm:hidden">
-                    <span class="text-[10px] text-slate-400"><i class="fa-solid fa-chevron-left"></i> Geser <i class="fa-solid fa-chevron-right"></i></span>
+                <div class="flex justify-center gap-1 mt-1 sm:hidden">
+                    <span class="text-[10px] text-slate-400 animate-pulse">
+                        <i class="fa-solid fa-chevron-left"></i> Geser <i class="fa-solid fa-chevron-right"></i>
+                    </span>
                 </div>
             `;
         }
