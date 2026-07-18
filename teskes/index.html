@@ -817,40 +817,77 @@
         function renderStats(dataList) {
             const statsContainer = document.getElementById('stats-container');
             const total = dataList.length;
-
-            let s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+        
+            // 🔥 Hitung jumlah per tanggal (1-10 Agustus 2026)
+            const dateCounts = {};
+            const dateLabels = {};
+            
+            // Inisialisasi semua tanggal 1-10 Agustus 2026
+            for (let d = 1; d <= 10; d++) {
+                const dateStr = '2026-08-' + String(d).padStart(2, '0');
+                dateCounts[dateStr] = 0;
+                dateLabels[dateStr] = d + ' Agt';
+            }
+        
+            // Hitung data per tanggal
             dataList.forEach(item => {
-                if (item.sesi && item.sesi.includes("1")) s1++;
-                else if (item.sesi && item.sesi.includes("2")) s2++;
-                else if (item.sesi && item.sesi.includes("3")) s3++;
-                else if (item.sesi && item.sesi.includes("4")) s4++;
+                if (item.tanggal) {
+                    const tanggal = item.tanggal.substring(0, 10);
+                    if (dateCounts.hasOwnProperty(tanggal)) {
+                        dateCounts[tanggal]++;
+                    }
+                }
             });
-
-            statsContainer.innerHTML = `
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
-                    <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-users"></i></div>
+        
+            // 🔥 Buat HTML untuk statistik
+            let statsHtml = `
+                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center min-w-[100px] flex-shrink-0">
+                    <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
                     <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Total</div>
                     <div class="text-base font-extrabold text-slate-900 mt-0.5">${total} <span class="text-xs font-normal text-slate-400">Camaba</span></div>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
-                    <div class="bg-amber-100 text-amber-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-sun"></i></div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 1</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s1} <span class="text-xs font-normal text-slate-400">Org</span></div>
+            `;
+        
+            // Loop untuk setiap tanggal
+            const dateKeys = Object.keys(dateCounts).sort();
+            dateKeys.forEach(dateStr => {
+                const count = dateCounts[dateStr];
+                const label = dateLabels[dateStr];
+                
+                let bgColor = 'bg-slate-100';
+                let textColor = 'text-slate-700';
+                let iconColor = 'text-slate-500';
+                let icon = 'fa-regular fa-calendar';
+                
+                if (count > 0) {
+                    bgColor = 'bg-emerald-100';
+                    textColor = 'text-emerald-800';
+                    iconColor = 'text-emerald-600';
+                    icon = 'fa-solid fa-calendar-check';
+                }
+                
+                statsHtml += `
+                    <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center min-w-[80px] flex-shrink-0">
+                        <div class="${bgColor} ${textColor} p-2 rounded-xl mb-1 text-sm">
+                            <i class="${icon} ${iconColor}"></i>
+                        </div>
+                        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">${label}</div>
+                        <div class="text-base font-extrabold ${textColor} mt-0.5">${count} <span class="text-xs font-normal text-slate-400">Org</span></div>
+                    </div>
+                `;
+            });
+        
+            // Bungkus dengan container horizontal scrollable
+            statsContainer.innerHTML = `
+                <div class="overflow-x-auto pb-2 scroll-smooth">
+                    <div class="flex gap-3 sm:gap-4" style="min-width: max-content;">
+                        ${statsHtml}
+                    </div>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
-                    <div class="bg-sky-100 text-sky-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-sun"></i></div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 2</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s2} <span class="text-xs font-normal text-slate-400">Org</span></div>
-                </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center">
-                    <div class="bg-purple-100 text-purple-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-cloud-moon"></i></div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 3</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s3} <span class="text-xs font-normal text-slate-400">Org</span></div>
-                </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center col-span-2 sm:col-span-1">
-                    <div class="bg-teal-100 text-teal-700 p-2 rounded-xl mb-1 text-sm"><i class="fa-solid fa-moon"></i></div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Sesi 4</div>
-                    <div class="text-base font-extrabold text-slate-900 mt-0.5">${s4} <span class="text-xs font-normal text-slate-400">Org</span></div>
+                <div class="flex justify-center gap-1 mt-2 sm:hidden">
+                    <span class="text-[10px] text-slate-400"><i class="fa-solid fa-chevron-left"></i> Geser <i class="fa-solid fa-chevron-right"></i></span>
                 </div>
             `;
         }
