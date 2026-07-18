@@ -818,6 +818,10 @@
             const statsContainer = document.getElementById('stats-container');
             const total = dataList.length;
         
+            // 🔥 HAPUS GRID - set display block agar full width
+            statsContainer.style.display = 'block';
+            statsContainer.className = 'mb-6 text-center';
+        
             // Hitung jumlah per tanggal (1-10 Agustus 2026)
             const dateCounts = {};
             const dateLabels = {};
@@ -875,9 +879,9 @@
                 `;
             });
         
-            // 🔥 PERBAIKAN: Menggunakan Tailwind classes
+            // Container dengan overflow auto
             statsContainer.innerHTML = `
-                <div class="w-full overflow-x-auto overflow-y-hidden pb-3 -mx-2 px-2">
+                <div class="w-full overflow-x-auto overflow-y-hidden pb-3">
                     <div class="flex gap-3" style="width: max-content; min-width: 100%;">
                         ${statsHtml}
                     </div>
