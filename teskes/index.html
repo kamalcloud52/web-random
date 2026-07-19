@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cari Teman Tes Kesehatan - Camaba UNNES</title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="teskes.png">
-    <link rel="shortcut icon" type="image/png" href="teskes.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -248,15 +245,23 @@
                     <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
                         <i class="fa-solid fa-sliders text-amber-500 mr-2"></i> Penyaringan Pencarian Teman
                     </h2>
-                    <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
-                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
-                        <span class="hidden sm:inline">Segarkan Data</span>
-                        <span class="sm:hidden">Refresh</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <!-- 🔥 TOMBOL RESET FILTER -->
+                        <button onclick="resetFilters()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span class="hidden sm:inline">Reset Filter</span>
+                            <span class="sm:hidden">Reset</span>
+                        </button>
+                        <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
+                            <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
+                            <span class="hidden sm:inline">Segarkan Data</span>
+                            <span class="sm:hidden">Refresh</span>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <!-- Search Input -->
+                    <!-- Search Input dengan Tombol X -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 mb-1.5">Nama atau Prodi</label>
                         <div class="relative">
@@ -264,7 +269,11 @@
                                 <i class="fa-solid fa-magnifying-glass"></i>
                             </span>
                             <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari..." 
-                                class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
+                                class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
+                            <!-- 🔥 TOMBOL X UNTUK MENGHAPUS TEKS PENCARIAN -->
+                            <button onclick="clearSearch()" id="clear-search-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 hidden">
+                                <i class="fa-solid fa-xmark text-lg"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -322,7 +331,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 text-center" id="stats-container">
+            <div id="stats-container" class="mb-6 text-center">
                 <!-- Diisi otomatis melalui JS -->
             </div>
 
@@ -597,7 +606,7 @@
 
         function submitForm(e) {
             e.preventDefault();
-        
+
             const nama = document.getElementById('nama').value.trim();
             const fakultas = document.getElementById('fakultas').value;
             const prodi = document.getElementById('prodi').value;
@@ -605,39 +614,34 @@
             const sesi = document.getElementById('sesi').value;
             const jenisKontak = document.getElementById('jenis-kontak').value;
             const kontak = document.getElementById('kontak').value.trim();
-        
+
             const btnSubmit = document.getElementById('btn-submit');
             const messageBox = document.getElementById('form-message');
-        
-            // 🔥 FUNGSI NORMALISASI
+
             function normalizeString(str) {
                 return str.toLowerCase().trim().replace(/\s+/g, ' ');
             }
-        
+
             function normalizeKontak(str) {
-                // Hapus spasi, @, dan karakter khusus, lalu lowercase
                 return str.toLowerCase().trim().replace(/[\s@]/g, '');
             }
-        
-            // 🔥 CEK DUPLIKAT - KETAT
-            // 1. Cek berdasarkan Nama + Kontak (case insensitive, whitespace normalized)
+
+            // CEK DUPLIKAT - Nama + Kontak
             const isDuplicate = camabaList.some(item => {
                 const itemNama = normalizeString(item.nama || '');
                 const itemKontak = normalizeKontak(item.kontak || '');
                 const formNama = normalizeString(nama);
                 const formKontak = normalizeKontak(kontak);
-                
-                // Nama harus sama PERSIS (setelah normalisasi) DAN kontak sama PERSIS
                 return itemNama === formNama && itemKontak === formKontak;
             });
-        
+
             if (isDuplicate) {
                 messageBox.className = "p-4 rounded-xl text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200 block";
                 messageBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>⚠️ Data dengan nama dan kontak ini sudah terdaftar! Tidak boleh isi dua kali.';
                 return;
             }
-        
-            // 2. Cek berdasarkan Nama + Tanggal + Sesi (case insensitive)
+
+            // CEK DUPLIKAT - Nama + Tanggal + Sesi
             const isDuplicateJadwal = camabaList.some(item => {
                 const itemNama = normalizeString(item.nama || '');
                 const itemTanggal = (item.tanggal || '').substring(0, 10);
@@ -645,33 +649,21 @@
                 const formNama = normalizeString(nama);
                 const formTanggal = tanggal.substring(0, 10);
                 const formSesi = normalizeString(sesi);
-                
                 return itemNama === formNama && itemTanggal === formTanggal && itemSesi === formSesi;
             });
-        
+
             if (isDuplicateJadwal) {
                 messageBox.className = "p-4 rounded-xl text-sm font-semibold bg-amber-100 text-amber-800 border border-amber-200 block";
                 messageBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>⚠️ Anda sudah mendaftar untuk jadwal ini! Tidak boleh isi dua kali.';
                 return;
             }
-        
-            // 3. 🔥 CEK KEMIRIPAN NAMA (opsional - mencegah typo kecil)
-            // Contoh: "Budi" vs "budi" dianggap sama, "Budi" vs "Budii" dianggap berbeda
-            const similarName = camabaList.some(item => {
-                const itemNama = normalizeString(item.nama || '');
-                const formNama = normalizeString(nama);
-                
-                // Jika nama sama persis setelah normalisasi, sudah ketahuan di cek sebelumnya
-                // Ini untuk cek kemiripan (optional)
-                return false; // Nonaktifkan dulu agar tidak terlalu ketat
-            });
-        
+
             messageBox.classList.add('hidden');
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i><span>Mengirim Data...</span>';
-        
+
             const generatedSessionCode = generateSessionCodePreview();
-        
+
             const payload = {
                 nama: nama,
                 fakultas: fakultas,
@@ -682,7 +674,7 @@
                 jenisKontak: jenisKontak,
                 kontak: kontak
             };
-        
+
             fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
@@ -701,7 +693,7 @@
                 document.getElementById('formPoling').reset();
                 document.getElementById('prodi').disabled = true;
                 document.getElementById('session-code-preview').classList.add('hidden');
-        
+
                 setTimeout(() => {
                     messageBox.classList.add('hidden');
                     fetchData();
@@ -718,8 +710,15 @@
         }
 
         function fetchData() {
+            // 🔥 RESET FILTER KE DEFAULT SAAT REFRESH
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-fakultas').value = '';
+            document.getElementById('filter-tanggal').value = '';
+            document.getElementById('filter-sesi').value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+
             const refreshIcon = document.getElementById('refresh-icon');
-            refreshIcon.classList.add('animate-spin');
+            if (refreshIcon) refreshIcon.classList.add('animate-spin');
 
             const loadingState = document.getElementById('loading-state');
             const emptyState = document.getElementById('empty-state');
@@ -730,16 +729,12 @@
             cardsContainer.innerHTML = '';
 
             const url = API_URL + "?action=read";
-            console.log("🔍 Fetching from:", url);
 
             fetch(url)
                 .then(response => {
-                    console.log("📡 Response status:", response.status);
                     return response.text();
                 })
                 .then(text => {
-                    console.log("📄 Raw response length:", text.length);
-                    
                     let cleanText = text.trim();
                     if (cleanText.charCodeAt(0) === 0xFEFF) {
                         cleanText = cleanText.slice(1);
@@ -747,14 +742,12 @@
                     
                     try {
                         const json = JSON.parse(cleanText);
-                        console.log("✅ Parsed JSON:", json);
                         
-                        refreshIcon.classList.remove('animate-spin');
+                        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
                         loadingState.classList.add('hidden');
                         
                         if (json.status === "success") {
                             camabaList = json.data || [];
-                            console.log("📊 Total data:", camabaList.length);
                             
                             if (camabaList.length === 0) {
                                 emptyState.classList.remove('hidden');
@@ -772,9 +765,8 @@
                         }
                     } catch (parseError) {
                         console.error("❌ Parse error:", parseError);
-                        console.error("❌ Full response:", text);
                         
-                        refreshIcon.classList.remove('animate-spin');
+                        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
                         loadingState.classList.add('hidden');
                         emptyState.classList.remove('hidden');
                         document.getElementById('empty-title').textContent = 'Error Parse Data';
@@ -783,7 +775,7 @@
                 })
                 .catch(err => {
                     console.error("❌ Fetch error:", err);
-                    refreshIcon.classList.remove('animate-spin');
+                    if (refreshIcon) refreshIcon.classList.remove('animate-spin');
                     loadingState.classList.add('hidden');
                     emptyState.classList.remove('hidden');
                     document.getElementById('empty-title').textContent = 'Koneksi Gagal';
@@ -794,21 +786,21 @@
         function renderCards(dataList) {
             const cardsContainer = document.getElementById('cards-container');
             const emptyState = document.getElementById('empty-state');
-        
+
             cardsContainer.innerHTML = '';
-        
+
             if (!dataList || dataList.length === 0) {
                 emptyState.classList.remove('hidden');
                 document.getElementById('empty-title').textContent = 'Tidak Ada Teman Ditemukan';
                 document.getElementById('empty-desc').textContent = 'Sesuaikan filter atau isi data di tab "Isi Data Poling".';
                 return;
             }
-        
+
             emptyState.classList.add('hidden');
-        
-            // 🔥 BALIK URUTAN: data terbaru di atas
-            var reversedData = [...dataList].reverse();
-        
+
+            // BALIK URUTAN: data terbaru di atas
+            const reversedData = [...dataList].reverse();
+
             reversedData.forEach(item => {
                 const card = document.createElement('div');
                 card.className = "bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between relative overflow-hidden";
@@ -816,20 +808,20 @@
                 const accentBorder = document.createElement('div');
                 accentBorder.className = "absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-900 to-amber-500";
                 card.appendChild(accentBorder);
-        
+
                 let contactBtnHtml = '';
                 const rawContact = item.kontak ? String(item.kontak).trim() : '';
                 const cleanContact = rawContact.replace(/^@/, "");
                 const jenisKontak = item.jenisKontak || 'WhatsApp';
-        
+
                 let jamSesi = "";
                 if (item.sesi && item.sesi.includes("1")) jamSesi = "08.00 - 10.00";
                 else if (item.sesi && item.sesi.includes("2")) jamSesi = "10.00 - 11.30";
                 else if (item.sesi && item.sesi.includes("3")) jamSesi = "13.00 - 15.00";
                 else if (item.sesi && item.sesi.includes("4")) jamSesi = "15.00 - 16.30";
-        
+
                 const kodeTampilanSesi = item.kodeSesi || "?";
-        
+
                 if (jenisKontak === 'Telegram') {
                     const teleUsername = cleanContact || rawContact;
                     contactBtnHtml = `
@@ -855,12 +847,12 @@
                         </a>
                     `;
                 }
-        
+
                 let sessionBadgeClass = "bg-amber-100 text-amber-800 border-amber-200";
                 if (item.sesi && item.sesi.includes("2")) sessionBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
                 if (item.sesi && item.sesi.includes("3")) sessionBadgeClass = "bg-purple-100 text-purple-800 border-purple-200";
                 if (item.sesi && item.sesi.includes("4")) sessionBadgeClass = "bg-teal-100 text-teal-800 border-teal-200";
-        
+
                 card.innerHTML += `
                     <div>
                         <div class="flex items-start justify-between gap-2 mb-3">
@@ -876,7 +868,7 @@
                                 <span class="text-[9px] text-slate-400 font-medium">${item.sesi ? `Sesi ${item.sesi.replace(/[^0-9]/g, "")}` : '-'}</span>
                             </div>
                         </div>
-        
+
                         <div class="bg-slate-50 rounded-xl p-3 space-y-1.5 text-xs border border-slate-100 mt-2">
                             <div class="flex items-center text-slate-600">
                                 <i class="fa-regular fa-calendar-days text-slate-400 mr-2 text-sm w-4 text-center"></i>
@@ -888,7 +880,7 @@
                             </div>
                         </div>
                     </div>
-        
+
                     ${contactBtnHtml}
                 `;
                 cardsContainer.appendChild(card);
@@ -898,11 +890,11 @@
         function renderStats(dataList) {
             const statsContainer = document.getElementById('stats-container');
             const total = dataList.length;
-        
-            // 🔥 HAPUS GRID - set display block agar full width
+
+            // HAPUS GRID - set display block agar full width
             statsContainer.style.display = 'block';
             statsContainer.className = 'mb-6 text-center';
-        
+
             // Hitung jumlah per tanggal (1-10 Agustus 2026)
             const dateCounts = {};
             const dateLabels = {};
@@ -912,7 +904,7 @@
                 dateCounts[dateStr] = 0;
                 dateLabels[dateStr] = d + ' Agt';
             }
-        
+
             dataList.forEach(item => {
                 if (item.tanggal) {
                     const tanggal = item.tanggal.substring(0, 10);
@@ -921,7 +913,7 @@
                     }
                 }
             });
-        
+
             let statsHtml = `
                 <div class="bg-white p-3 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-center items-center min-w-[90px] flex-shrink-0">
                     <div class="bg-blue-100 text-blue-900 p-2 rounded-xl mb-1 text-sm">
@@ -931,7 +923,7 @@
                     <div class="text-base font-extrabold text-slate-900 mt-0.5">${total}</div>
                 </div>
             `;
-        
+
             const dateKeys = Object.keys(dateCounts).sort();
             dateKeys.forEach(dateStr => {
                 const count = dateCounts[dateStr];
@@ -959,7 +951,7 @@
                     </div>
                 `;
             });
-        
+
             // Container dengan overflow auto
             statsContainer.innerHTML = `
                 <div class="w-full overflow-x-auto overflow-y-hidden pb-3">
@@ -975,7 +967,6 @@
             `;
         }
 
-        // 🔥 PERBAIKAN: Filter tanggal dengan includes()
         function applyFilters() {
             const fSearch = document.getElementById('filter-search').value.toLowerCase();
             const fFakultas = document.getElementById('filter-fakultas').value;
@@ -1002,8 +993,39 @@
             renderCards(filteredData);
         }
 
+        // FUNGSI RESET FILTER
+        function resetFilters() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-fakultas').value = '';
+            document.getElementById('filter-tanggal').value = '';
+            document.getElementById('filter-sesi').value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            renderCards(camabaList);
+        }
+
+        // FUNGSI CLEAR SEARCH (Tombol X)
+        function clearSearch() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            applyFilters();
+        }
+
         window.onload = function() {
             updateContactPlaceholder();
+            
+            // Event listener untuk tombol X pada search
+            const searchInput = document.getElementById('filter-search');
+            const clearBtn = document.getElementById('clear-search-btn');
+            
+            if (searchInput && clearBtn) {
+                searchInput.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        clearBtn.classList.remove('hidden');
+                    } else {
+                        clearBtn.classList.add('hidden');
+                    }
+                });
+            }
         };
     </script>
 </body>
