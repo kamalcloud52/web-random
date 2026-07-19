@@ -56,7 +56,7 @@
         <!-- TAB 1: FORM REGISTER POLING -->
         <div id="tab-daftar" class="block max-w-3xl mx-auto">
             
-            <!-- ✅ WELCOME BANNER HANYA DI TAB ISI DATA -->
+            <!-- WELCOME BANNER HANYA DI TAB ISI DATA -->
             <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-4 sm:p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-start space-x-3.5">
                     <div class="bg-blue-600 text-white p-2 rounded-lg mt-1 hidden sm:block">
@@ -237,7 +237,6 @@
 
         <!-- TAB 2: DIREKTORI PENCARIAN TEMAN -->
         <div id="tab-pantau" class="hidden">
-            <!-- ❌ BANNER TIDAK ADA DI SINI -->
 
             <!-- Filter & Search Panel -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-5 mb-6">
@@ -245,19 +244,6 @@
                     <h2 class="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center">
                         <i class="fa-solid fa-sliders text-amber-500 mr-2"></i> Penyaringan Pencarian Teman
                     </h2>
-                    <div class="flex items-center gap-2">
-                        <!-- 🔥 TOMBOL RESET FILTER -->
-                        <button onclick="resetFilters()" class="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
-                            <i class="fa-solid fa-rotate-left"></i>
-                            <span class="hidden sm:inline">Reset Filter</span>
-                            <span class="sm:hidden">Reset</span>
-                        </button>
-                        <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all">
-                            <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i>
-                            <span class="hidden sm:inline">Segarkan Data</span>
-                            <span class="sm:hidden">Refresh</span>
-                        </button>
-                    </div>
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -270,7 +256,7 @@
                             </span>
                             <input type="text" id="filter-search" oninput="applyFilters()" placeholder="Cari..." 
                                 class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all">
-                            <!-- 🔥 TOMBOL X UNTUK MENGHAPUS TEKS PENCARIAN -->
+                            <!-- TOMBOL X UNTUK MENGHAPUS TEKS PENCARIAN -->
                             <button onclick="clearSearch()" id="clear-search-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 hidden">
                                 <i class="fa-solid fa-xmark text-lg"></i>
                             </button>
@@ -327,6 +313,16 @@
                             <option value="Sesi 4">Sesi 4</option>
                         </select>
                     </div>
+                </div>
+
+                <!-- 🔥 TOMBOL RESET FILTER & REFRESH DI BAWAH FILTER -->
+                <div class="flex flex-wrap justify-center gap-3 mt-4 pt-3 border-t border-slate-100">
+                    <button onclick="resetFilters()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-rotate-left"></i> Reset Filter
+                    </button>
+                    <button onclick="fetchData()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all">
+                        <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> Refresh Data
+                    </button>
                 </div>
             </div>
 
