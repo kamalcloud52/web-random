@@ -56,23 +56,24 @@
     <!-- Main Content -->
     <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6">
         
-        <!-- Welcome Banner -->
-        <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-4 sm:p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div class="flex items-start space-x-3.5">
-                <div class="bg-blue-600 text-white p-2 rounded-lg mt-1 hidden sm:block">
-                    <i class="fa-solid fa-bullhorn text-sm"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-blue-950 text-sm sm:text-base">Cari Teman Seperjuangan Tes Kesehatan UNNES!</h3>
-                    <p class="text-xs sm:text-sm text-blue-800 mt-0.5 leading-relaxed">
-                        Masukkan jadwal tes kesehatanmu mulai tanggal <strong>1 s.d 10 Agustus 2026</strong>. Saling sapa, koordinasi berangkat bareng, atau buat grup komunikasi agar tidak sendirian saat di lokasi tes kesehatan UNNES!
-                    </p>
-                </div>
-            </div>
-        </div>
-
         <!-- TAB 1: FORM REGISTER POLING -->
         <div id="tab-daftar" class="block max-w-3xl mx-auto">
+            
+            <!-- ✅ WELCOME BANNER HANYA DI TAB ISI DATA -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border-l-4 border-blue-700 p-4 sm:p-5 rounded-r-2xl mb-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start space-x-3.5">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg mt-1 hidden sm:block">
+                        <i class="fa-solid fa-bullhorn text-sm"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-blue-950 text-sm sm:text-base">Cari Teman Seperjuangan Tes Kesehatan UNNES!</h3>
+                        <p class="text-xs sm:text-sm text-blue-800 mt-0.5 leading-relaxed">
+                            Masukkan jadwal tes kesehatanmu mulai tanggal <strong>1 s.d 10 Agustus 2026</strong>. Saling sapa, koordinasi berangkat bareng, atau buat grup komunikasi agar tidak sendirian saat di lokasi tes kesehatan UNNES!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Registration Form -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6 md:p-8">
                 <div class="border-b border-slate-100 pb-3 sm:pb-4 mb-4 sm:mb-6">
@@ -239,6 +240,8 @@
 
         <!-- TAB 2: DIREKTORI PENCARIAN TEMAN -->
         <div id="tab-pantau" class="hidden">
+            <!-- ❌ BANNER TIDAK ADA DI SINI -->
+
             <!-- Filter & Search Panel -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-5 mb-6">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
@@ -359,7 +362,7 @@
                 <p class="text-xs sm:text-sm text-slate-500 mt-1">Sistem informasi koordinasi dan silaturahmi Calon Mahasiswa Baru UNNES.</p>
             </div>
             <div class="flex flex-col items-center sm:items-end gap-2 max-w-sm sm:max-w-md">
-                <!-- Peringatan diperbesar -->
+                <!-- Peringatan disclaimer diperbesar -->
                 <div class="text-xs sm:text-sm text-amber-400/80 bg-amber-950/30 px-3 py-1.5 rounded-lg border border-amber-800/30">
                     ⚠️ Website ini adalah <strong>inisiatif calon mahasiswa baru</strong>, bukan website resmi UNNES. Data hanya digunakan untuk koordinasi antar calon mahasiswa baru.
                 </div>
