@@ -606,12 +606,25 @@
             const btnSubmit = document.getElementById('btn-submit');
             const messageBox = document.getElementById('form-message');
         
-            // 🔥 CEK DUPLIKAT berdasarkan Nama + Kontak
+            // 🔥 FUNGSI NORMALISASI
+            function normalizeString(str) {
+                return str.toLowerCase().trim().replace(/\s+/g, ' ');
+            }
+        
+            function normalizeKontak(str) {
+                // Hapus spasi, @, dan karakter khusus, lalu lowercase
+                return str.toLowerCase().trim().replace(/[\s@]/g, '');
+            }
+        
+            // 🔥 CEK DUPLIKAT - KETAT
+            // 1. Cek berdasarkan Nama + Kontak (case insensitive, whitespace normalized)
             const isDuplicate = camabaList.some(item => {
-                const itemNama = item.nama ? String(item.nama).toLowerCase().trim() : '';
-                const itemKontak = item.kontak ? String(item.kontak).trim() : '';
-                const formNama = nama.toLowerCase().trim();
-                const formKontak = kontak.trim();
+                const itemNama = normalizeString(item.nama || '');
+                const itemKontak = normalizeKontak(item.kontak || '');
+                const formNama = normalizeString(nama);
+                const formKontak = normalizeKontak(kontak);
+                
+                // Nama harus sama PERSIS (setelah normalisasi) DAN kontak sama PERSIS
                 return itemNama === formNama && itemKontak === formKontak;
             });
         
@@ -621,14 +634,15 @@
                 return;
             }
         
-            // 🔥 CEK DUPLIKAT berdasarkan Nama + Tanggal + Sesi
+            // 2. Cek berdasarkan Nama + Tanggal + Sesi (case insensitive)
             const isDuplicateJadwal = camabaList.some(item => {
-                const itemNama = item.nama ? String(item.nama).toLowerCase().trim() : '';
-                const itemTanggal = item.tanggal ? String(item.tanggal).substring(0, 10) : '';
-                const itemSesi = item.sesi ? String(item.sesi).trim() : '';
-                const formNama = nama.toLowerCase().trim();
+                const itemNama = normalizeString(item.nama || '');
+                const itemTanggal = (item.tanggal || '').substring(0, 10);
+                const itemSesi = normalizeString(item.sesi || '');
+                const formNama = normalizeString(nama);
                 const formTanggal = tanggal.substring(0, 10);
-                const formSesi = sesi.trim();
+                const formSesi = normalizeString(sesi);
+                
                 return itemNama === formNama && itemTanggal === formTanggal && itemSesi === formSesi;
             });
         
@@ -637,6 +651,17 @@
                 messageBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i>⚠️ Anda sudah mendaftar untuk jadwal ini! Tidak boleh isi dua kali.';
                 return;
             }
+        
+            // 3. 🔥 CEK KEMIRIPAN NAMA (opsional - mencegah typo kecil)
+            // Contoh: "Budi" vs "budi" dianggap sama, "Budi" vs "Budii" dianggap berbeda
+            const similarName = camabaList.some(item => {
+                const itemNama = normalizeString(item.nama || '');
+                const formNama = normalizeString(nama);
+                
+                // Jika nama sama persis setelah normalisasi, sudah ketahuan di cek sebelumnya
+                // Ini untuk cek kemiripan (optional)
+                return false; // Nonaktifkan dulu agar tidak terlalu ketat
+            });
         
             messageBox.classList.add('hidden');
             btnSubmit.disabled = true;
