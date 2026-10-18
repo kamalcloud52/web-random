@@ -13,30 +13,40 @@ document.addEventListener('alpine:init', () => {
         // State Toast
         toast: { show: false, message: '' },
 
-        // State Drag
+        // State Drag (Bottom Sheet)
         sheetTop: 340,
         isDragging: false,
         startY: 0,
         startTop: 340,
         headerHeight: 340,
 
-        // State Indikator Tab
+        // State Indikator Tab Bulan
         indicatorStyle: 'transform: translateX(0px); width: 0px;',
 
-        // Lifecycle: Berjalan otomatis saat halaman dimuat
+        // Lifecycle: Berjalan otomatis saat halaman pertama kali dimuat
         init() {
             this.$nextTick(() => {
-                // Hitung tinggi header untuk posisi awal sheet riwayat
+                // 1. Hitung tinggi header untuk posisi awal sheet riwayat
                 this.headerHeight = document.getElementById('headerArea').offsetHeight;
                 this.sheetTop = this.headerHeight;
                 
-                // Pantau perubahan bulan untuk animasi garis bawah tab
+                // 2. Pantau perubahan bulan untuk animasi garis bawah tab
                 this.$watch('$store.kas.activeMonth', () => {
                     this.$nextTick(() => this.moveTabIndicator());
                 });
                 
+                // 3. Set posisi indikator pertama kali
                 this.moveTabIndicator();
-                
+
+                // 4. FIX INDICATOR: Paksa ukur ulang setelah font (Plus Jakarta Sans) selesai diunduh
+                // Karena font web seringkali mengubah lebar teks setelah render pertama
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(() => {
+                        this.moveTabIndicator();
+                    });
+                }
+
+                // 5. Update ukuran jika layar di-resize
                 window.addEventListener('resize', () => {
                     this.headerHeight = document.getElementById('headerArea').offsetHeight;
                     this.moveTabIndicator();
@@ -48,18 +58,26 @@ document.addEventListener('alpine:init', () => {
         get activeMonth() {
             return this.$store.kas.activeMonth;
         },
+        
         changeMonth(month) {
             this.$store.kas.activeMonth = month;
         },
+
         moveTabIndicator() {
             const activeTab = document.getElementById(`tab-${this.$store.kas.activeMonth}`);
             const container = document.getElementById('monthTabs');
             const indicator = document.getElementById('tabIndicator');
             
             if (activeTab && container && indicator) {
-                const left = activeTab.offsetLeft;
-                const width = activeTab.offsetWidth;
-                this.indicatorStyle = `transform: translateX(${left}px); width: ${width}px;`;
+                // FIX ALIGNMENT: Gunakan getBoundingClientRect agar tidak terpengaruh margin/padding parent
+                const containerRect = container.getBoundingClientRect();
+                const tabRect = activeTab.getBoundingClientRect();
+                
+                // Hitung jarak dari kiri container ke kiri tab
+                const left = tabRect.left - containerRect.left;
+
+                // Terapkan translateX dan lebar yang presisi
+                this.indicatorStyle = `transform: translateX(${left}px); width: ${tabRect.width}px;`;
             }
         },
 
@@ -104,6 +122,7 @@ document.addEventListener('alpine:init', () => {
                 this.form.members = [...this.$store.kas.members];
             }
         },
+
         submitTransaction() {
             const amount = parseInt(this.form.amount.replace(/\./g, ''), 10);
             if (!this.form.desc || isNaN(amount) || amount <= 0) return this.showToast('Isi keterangan & nominal dengan benar');
@@ -118,17 +137,19 @@ document.addEventListener('alpine:init', () => {
                 members: this.form.members
             };
 
-            // Panggil fungsi dari Store
+            // Panggil fungsi dari Store (store.js)
             this.$store.kas.addTransaction(newTx);
 
             this.closeAddModal();
             this.showToast('Transaksi berhasil ditambahkan');
         },
+
         closeAddModal() {
             this.modals.add = false;
+            // Reset form setelah animasi tutup selesai (300ms)
             setTimeout(() => {
                 this.form = { type: 'out', desc: '', amount: '', members: [] };
-            }, 300); // Reset setelah animasi tutup selesai
+            }, 300); 
         },
 
         // --- LOGIC FILTER (COMPUTED PROPERTY) ---
@@ -139,16 +160,19 @@ document.addEventListener('alpine:init', () => {
                 if (this.filters.to && tx.date > this.filters.to) ok = false;
                 if (this.filters.type !== 'all' && tx.type !== this.filters.type) ok = false;
                 
+                // Anggota hanya dicek jika jenisnya bukan pengeluaran
                 if (this.filters.type !== 'out' && this.filters.member !== 'all') {
                     if (!tx.members || !tx.members.includes(this.filters.member)) ok = false;
                 }
                 return ok;
             });
         },
+
         applyFilter() {
             this.modals.filter = false;
             this.showToast(`Filter diterapkan — ${this.filteredTransactions.length} transaksi ditampilkan`);
         },
+
         resetFilter() {
             this.filters = { from: '', to: '', type: 'all', member: 'all' };
         },
@@ -158,6 +182,7 @@ document.addEventListener('alpine:init', () => {
             this.showToast('Menyiapkan dokumen cetak PDF...');
             setTimeout(() => window.print(), 500);
         },
+
         showToast(message) {
             this.toast.message = message;
             this.toast.show = true;
