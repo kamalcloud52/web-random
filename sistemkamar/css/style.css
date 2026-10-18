@@ -1,0 +1,111 @@
+/* ==========================================================================
+   1. CUSTOM SCROLLBAR (Menyembunyikan scrollbar agar UI lebih bersih)
+   ========================================================================== */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ==========================================================================
+   2. DRAG HANDLE (Untuk Bottom Sheet Riwayat)
+   ========================================================================== */
+.drag-handle {
+    touch-action: none; /* Mencegah browser melakukan scroll saat area ini di-drag */
+    cursor: grab;
+    user-select: none; /* Mencegah teks terseleksi saat drag di desktop */
+}
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* Utility untuk mematikan transisi CSS saat elemen sedang di-drag */
+.is-dragging {
+    transition: none !important;
+}
+
+/* ==========================================================================
+   3. ANIMASI AVATAR (Muncul dari bawah, satu per satu)
+   ========================================================================== */
+@keyframes avatarRise {
+    0%   { opacity: 0; transform: translateY(14px) scale(0.92); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.avatar-item {
+    opacity: 0;
+    animation: avatarRise 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Delay bertingkat untuk efek beruntun dari kiri ke kanan */
+.avatar-item:nth-child(1) { animation-delay: 0.05s; }
+.avatar-item:nth-child(2) { animation-delay: 0.12s; }
+.avatar-item:nth-child(3) { animation-delay: 0.19s; }
+.avatar-item:nth-child(4) { animation-delay: 0.26s; }
+.avatar-item:nth-child(5) { animation-delay: 0.33s; }
+
+/* ==========================================================================
+   4. INDIKATOR TAB BULAN
+   ========================================================================== */
+/* Base style untuk garis bawah (warna dan tinggi diatur via Tailwind di HTML) */
+#tabIndicator {
+    width: 0;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, width; /* Optimasi performa animasi */
+}
+
+/* ==========================================================================
+   5. STATE DISABLED (Untuk Pilihan Anggota di Modal Filter)
+   ========================================================================== */
+.member-choice.is-disabled {
+    pointer-events: none; /* Tidak bisa diklik */
+    opacity: 0.4;         /* Redup */
+    filter: grayscale(1); /* Jadi hitam putih */
+}
+
+/* ==========================================================================
+   6. PENGATURAN KHUSUS UNTUK PRINT / CETAK PDF
+   ========================================================================== */
+@media print {
+    /* Paksa background jadi putih agar hemat tinta */
+    body {
+        background: white !important;
+        padding: 0 !important;
+        min-height: auto !important;
+    }
+    
+    /* Sembunyikan elemen yang tidak perlu dicetak (tombol, modal, toast, dll) */
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Hilangkan efek frame HP saat dicetak, jadikan kertas penuh */
+    .mobile-frame {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    /* Pastikan sheet riwayat tidak terpotong dan tidak absolute saat print */
+    #historySheet {
+        position: static !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        padding-bottom: 0 !important;
+    }
+    
+    /* Pastikan avatar terlihat jelas (tidak transparan/beranimasi saat dicetak) */
+    .avatar-item {
+        opacity: 1 !important;
+        animation: none !important;
+        transform: none !important;
+    }
+}
