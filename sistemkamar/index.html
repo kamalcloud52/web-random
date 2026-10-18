@@ -151,12 +151,15 @@
     </div>
 
     <!-- ================= MODAL: Tambah Transaksi ================= -->
-    <!-- Hapus total animasi di pembungkus luar (fixed inset-0) agar tidak memudar -->
+    <!-- PEMBUNGKUS LUAR (Overlay) -->
     <div x-show="modals.add" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" 
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          @click="closeAddModal()">
         
-        <!-- Hanya div putih (card) ini yang melakukan animasi geser -->
-        <div @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar"
+        <!-- ISI MODAL (Card Putih) - WAJIB ada x-show="modals.add" di sini agar animasinya jalan -->
+        <div @click.stop x-show="modals.add" x-cloak 
+             class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar transform"
              x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="translate-y-full"
              x-transition:enter-end="translate-y-0"
@@ -223,11 +226,15 @@
     </div>
 
     <!-- ================= MODAL: Filter ================= -->
-    <!-- Sama seperti di atas, hapus transisi dari pembungkus luar -->
+    <!-- PEMBUNGKUS LUAR (Overlay) -->
     <div x-show="modals.filter" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          @click="modals.filter = false">
         
-        <div @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar"
+        <!-- ISI MODAL (Card Putih) - WAJIB ada x-show="modals.filter" di sini juga -->
+        <div @click.stop x-show="modals.filter" x-cloak 
+             class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar transform"
              x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="translate-y-full"
              x-transition:enter-end="translate-y-0"
