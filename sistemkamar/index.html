@@ -9,11 +9,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Plus Jakarta Sans -->
+    <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Alpine.js CDN (Wajib ditaruh di head dengan defer) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
 
+    <!-- Konfigurasi Tailwind -->
     <script>
         tailwind.config = {
             theme: {
@@ -29,65 +31,20 @@
             }
         }
     </script>
-    
-    <style>
-        /* ================== CUSTOM CSS ================== */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .drag-handle { touch-action: none; cursor: grab; }
-        .drag-handle:active { cursor: grabbing; }
-        .is-dragging { transition: none !important; }
-
-        /* Animasi avatar */
-        @keyframes avatarRise {
-            0%   { opacity: 0; transform: translateY(14px) scale(0.92); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .avatar-item {
-            opacity: 0;
-            animation: avatarRise 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-        /* x-for Alpine dimulai dari 1, jadi kita sesuaikan delay-nya */
-        .avatar-item:nth-child(1) { animation-delay: 0.05s; }
-        .avatar-item:nth-child(2) { animation-delay: 0.12s; }
-        .avatar-item:nth-child(3) { animation-delay: 0.19s; }
-        .avatar-item:nth-child(4) { animation-delay: 0.26s; }
-        .avatar-item:nth-child(5) { animation-delay: 0.33s; }
-
-        /* Indikator tab (diatur transform-nya oleh Alpine) */
-        #tabIndicator {
-            width: 0;
-            transition: transform 0.3s ease-out, width 0.3s ease-out;
-            will-change: transform, width;
-        }
-
-        .member-choice.is-disabled {
-            pointer-events: none;
-            opacity: 0.4;
-            filter: grayscale(1);
-        }
-
-        @media print {
-            body { background: white !important; padding: 0 !important; }
-            .no-print { display: none !important; }
-            .mobile-frame {
-                box-shadow: none !important; border: none !important;
-                max-width: 100% !important; width: 100% !important;
-                min-height: auto !important; height: auto !important;
-            }
-            .avatar-item { opacity: 1 !important; animation: none !important; transform: none !important; }
-        }
-    </style>
-</head>
-
-<body class="bg-slate-900 text-slate-800 min-h-[100dvh] sm:min-h-screen flex flex-col justify-between items-center font-sans p-0 sm:p-4">
 
     <!-- 
-        x-data="app()" adalah root komponen Alpine. 
-        Logikanya didefinisikan di dalam tag <script> di bagian bawah file.
+        PENTING: Urutan script harus: 
+        Utils -> Store -> App -> Alpine.js (terakhir agar langsung ter-init)
     -->
-    <div x-data="app()" id="mobileFrame" class="mobile-frame w-full max-w-md bg-slate-900 sm:rounded-[38px] shadow-2xl overflow-hidden h-[100dvh] sm:h-[844px] flex flex-col justify-between relative border-0 sm:border-[6px] border-slate-800 my-auto">
+    <script defer src="js/utils.js"></script>
+    <script defer src="js/store.js"></script>
+    <script defer src="js/app.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="app()" class="bg-slate-900 text-slate-800 min-h-[100dvh] sm:min-h-screen flex flex-col justify-between items-center font-sans p-0 sm:p-4">
+
+    <div class="mobile-frame w-full max-w-md bg-slate-900 sm:rounded-[38px] shadow-2xl overflow-hidden h-[100dvh] sm:h-[844px] flex flex-col justify-between relative border-0 sm:border-[6px] border-slate-800 my-auto">
 
         <!-- ================= 1. HEADER ================= -->
         <div id="headerArea" class="bg-gradient-to-b from-brand-800 via-brand-900 to-slate-900 text-white pt-7 pb-6 px-5 relative">
@@ -98,7 +55,6 @@
 
             <div class="mt-5 text-center relative z-10">
                 <span class="text-xs font-medium uppercase tracking-widest text-emerald-200/70 block">Saldo</span>
-                <!-- x-text otomatis update saat saldo berubah -->
                 <div class="text-3xl font-black text-white mt-0.5 tracking-tight" x-text="formatRupiah($store.kas.balance)"></div>
             </div>
 
@@ -108,7 +64,6 @@
 
             <div class="mt-3">
                 <div class="flex items-center justify-between space-x-2 overflow-x-auto no-scrollbar py-1 px-1">
-                    <!-- x-for merender avatar secara otomatis dari array -->
                     <template x-for="member in $store.kas.members" :key="member">
                         <button @click="showToast('Melihat riwayat transaksi ' + member)" class="avatar-item flex flex-col items-center flex-1 min-w-[58px] group focus:outline-none">
                             <div class="w-12 h-12 rounded-full bg-white/10 border-2 border-emerald-400/60 flex items-center justify-center shadow-md group-hover:scale-105 group-hover:border-white transition-all">
@@ -122,14 +77,12 @@
         </div>
 
         <!-- ================= 2. SHEET RIWAYAT ================= -->
-        <!-- Bind style top untuk efek drag -->
         <div id="historySheet"
              class="absolute inset-x-0 bottom-0 bg-white rounded-t-[28px] px-5 pt-3 pb-20 shadow-2xl overflow-y-auto no-scrollbar flex flex-col z-20"
              :class="{ 'is-dragging': isDragging }"
              :style="`top: ${sheetTop}px; transition: ${isDragging ? 'none' : 'top 0.3s ease-out'}`">
 
             <div>
-                <!-- Handle bar untuk drag -->
                 <div @pointerdown="startDrag($event)" class="drag-handle w-full flex justify-center py-2 select-none">
                     <span class="w-10 h-1 bg-slate-300 rounded-full block pointer-events-none"></span>
                 </div>
@@ -149,7 +102,6 @@
                         <button @click="changeMonth('September')" id="tab-September" :class="activeMonth === 'September' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors">September</button>
                         <button @click="changeMonth('Oktober')"   id="tab-Oktober"   :class="activeMonth === 'Oktober' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors">Oktober</button>
                         
-                        <!-- Indikator digeser oleh Alpine via variabel indicatorStyle -->
                         <span id="tabIndicator" class="absolute left-0 -bottom-[1px] h-[2px] bg-slate-900" :style="indicatorStyle"></span>
                     </div>
                     <button @click="modals.filter = true" class="no-print flex items-center gap-1 text-slate-600 hover:text-brand-600 pb-3">
@@ -160,7 +112,6 @@
 
                 <!-- Lista Transaksi -->
                 <div class="space-y-4">
-                    <!-- x-for otomatis merender transaksi berdasarkan data yang sudah difilter -->
                     <template x-for="tx in filteredTransactions" :key="tx.id">
                         <div>
                             <div class="text-[11px] font-bold text-slate-400 mb-1.5" x-text="formatDate(tx.date)"></div>
@@ -185,7 +136,7 @@
                     </template>
                 </div>
 
-                <!-- Pesan Kosong & End of List -->
+                <!-- State Kosong & End of List -->
                 <div x-show="filteredTransactions.length === 0" x-transition class="mt-6 text-center">
                     <i class="fa-regular fa-face-frown text-slate-300 text-2xl mb-2"></i>
                     <p class="text-xs text-slate-400 font-medium">Tidak ada transaksi yang cocok dengan filter.</p>
@@ -204,12 +155,11 @@
     </div>
 
     <!-- ================= MODAL: Tambah Transaksi ================= -->
-    <div x-data="app()" x-show="modals.add" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" 
+    <div x-show="modals.add" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" 
          x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-         @click="modals.add = false">
+         @click="closeAddModal()">
         
-        <!-- Inner modal dengan animasi slide up -->
         <div @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar transform transition-transform duration-300"
              x-transition:enter="translate-y-full sm:translate-y-0" x-transition:enter-start="translate-y-full sm:translate-y-0" x-transition:enter-end="translate-y-0"
              x-transition:leave="translate-y-0" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full sm:translate-y-0">
@@ -222,7 +172,6 @@
             </div>
 
             <form @submit.prevent="submitTransaction()" class="space-y-4">
-                <!-- Jenis Transaksi -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jenis Transaksi</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -241,19 +190,16 @@
                     </div>
                 </div>
 
-                <!-- Keterangan -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Sub-keterangan</label>
                     <input type="text" x-model="form.desc" placeholder="Contoh: Beli galon / Iuran & utang" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
 
-                <!-- Nominal (Format Ribuan) -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Nominal (Rp)</label>
                     <input type="text" inputmode="numeric" x-model="form.amount" @input="formatInputRibuan($event)" placeholder="20.000" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
 
-                <!-- Pilihan Anggota (Hanya muncul jika Pemasukan) -->
                 <div x-show="form.type === 'in'" x-transition>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="block text-xs font-semibold text-slate-600">Pemasukan dari</label>
@@ -277,7 +223,7 @@
     </div>
 
     <!-- ================= MODAL: Filter ================= -->
-    <div x-data="app()" x-show="modals.filter" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+    <div x-show="modals.filter" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
          x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
          @click="modals.filter = false">
@@ -293,7 +239,6 @@
                 </button>
             </div>
 
-            <!-- Rentang Tanggal -->
             <div class="mb-4">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Rentang Tanggal</label>
                 <div class="grid grid-cols-2 gap-3">
@@ -308,7 +253,6 @@
                 </div>
             </div>
 
-            <!-- Jenis Transaksi -->
             <div class="mb-4">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jenis Transaksi</label>
                 <div class="grid grid-cols-3 gap-2">
@@ -327,7 +271,6 @@
                 </div>
             </div>
 
-            <!-- Anggota (Disabled jika Pengeluaran) -->
             <div class="mb-5 transition-opacity duration-200" :class="{ 'opacity-60': filters.type === 'out' }">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Anggota</label>
                 <div class="grid grid-cols-3 gap-2">
@@ -345,7 +288,6 @@
                 <p x-show="filters.type === 'out'" class="text-[10px] text-slate-400 mt-1.5">Pengeluaran tidak terikat anggota, jadi pilihan ini tidak berlaku.</p>
             </div>
 
-            <!-- Tombol Aksi -->
             <div class="flex gap-3 pt-1">
                 <button type="button" @click="resetFilter()" class="flex-1 py-2.5 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition-colors">Reset</button>
                 <button type="button" @click="applyFilter()" class="flex-1 py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 shadow-md transition-colors">Terapkan</button>
@@ -354,7 +296,7 @@
     </div>
 
     <!-- ================= TOAST ================= -->
-    <div x-data="app()" x-show="toast.show" x-cloak 
+    <div x-show="toast.show" x-cloak 
          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-y-20" x-transition:enter-end="opacity-100 translate-y-0"
          x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-20"
          class="no-print fixed top-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-xl shadow-2xl text-xs font-semibold flex items-center gap-2 z-50">
@@ -362,207 +304,5 @@
         <span x-text="toast.message">Notifikasi</span>
     </div>
 
-    <!-- ================= LOGIKA ALPINE.JS ================= -->
-    <script>
-        document.addEventListener('alpine:init', () => {
-            
-            // --- STORE: Pusat Data Aplikasi ---
-            Alpine.store('kas', {
-                balance: 100000,
-                members: ['Ni\'am', 'Fajar', 'Nazim', 'Ahsan', 'Kazul'],
-                activeMonth: 'Oktober',
-                // Data awal (dummy)
-                transactions: [
-                    { id: 1, date: '2026-10-08', type: 'out', amount: 20000, desc: 'Beli galon', members: ['Ni\'am'] },
-                    { id: 2, date: '2026-10-07', type: 'in', amount: 40000, desc: 'Iuran & utang', members: ['Fajar'] }
-                ]
-            });
-
-            // --- KOMPONEN UI: Fungsi & State Lokal ---
-            Alpine.data('app', () => ({
-                // 1. State Modal
-                modals: { add: false, filter: false },
-                
-                // 2. State Form Tambah Transaksi
-                form: { type: 'out', desc: '', amount: '', members: [] },
-                
-                // 3. State Filter
-                filters: { from: '', to: '', type: 'all', member: 'all' },
-                
-                // 4. State Toast
-                toast: { show: false, message: '' },
-
-                // 5. State Drag Sheet
-                sheetTop: 340,
-                isDragging: false,
-                startY: 0,
-                startTop: 340,
-                headerHeight: 340,
-
-                // 6. State Indikator Tab
-                indicatorStyle: 'transform: translateX(0px); width: 0px;',
-
-                // --- LIFECYCLE ---
-                init() {
-                    // Hitung tinggi header untuk posisi awal sheet
-                    this.$nextTick(() => {
-                        this.headerHeight = this.$el.querySelector('#headerArea').offsetHeight;
-                        this.sheetTop = this.headerHeight;
-                        
-                        // Pantau perubahan activeMonth untuk menggeser indikator tab
-                        this.$watch('$store.kas.activeMonth', () => {
-                            this.$nextTick(() => this.moveTabIndicator());
-                        });
-                        
-                        // Set indikator pertama kali
-                        this.moveTabIndicator();
-                        
-                        // Update jika window di-resize
-                        window.addEventListener('resize', () => {
-                            this.headerHeight = this.$el.querySelector('#headerArea').offsetHeight;
-                            this.moveTabIndicator();
-                        });
-                    });
-                },
-
-                // --- FUNGSI HELPER ---
-                formatRupiah(number) {
-                    return 'Rp. ' + number.toLocaleString('id-ID');
-                },
-                formatDate(isoString) {
-                    const date = new Date(isoString);
-                    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
-                },
-                formatInputRibuan(e) {
-                    let digits = e.target.value.replace(/\D/g, '');
-                    if (digits === '') { e.target.value = ''; this.form.amount = ''; return; }
-                    digits = digits.replace(/^0+(?=\d)/, '');
-                    e.target.value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    this.form.amount = e.target.value;
-                },
-
-                // --- FUNGSI TAB BULAN ---
-                changeMonth(month) {
-                    this.$store.kas.activeMonth = month;
-                },
-                moveTabIndicator() {
-                    const activeTab = this.$el.querySelector(`#tab-${this.$store.kas.activeMonth}`);
-                    const container = this.$el.querySelector('#monthTabs');
-                    const indicator = this.$el.querySelector('#tabIndicator');
-                    
-                    if (activeTab && container && indicator) {
-                        const left = activeTab.offsetLeft;
-                        const width = activeTab.offsetWidth;
-                        this.indicatorStyle = `transform: translateX(${left}px); width: ${width}px;`;
-                    }
-                },
-
-                // --- FUNGSI DRAG SHEET ---
-                startDrag(e) {
-                    this.isDragging = true;
-                    this.startY = e.clientY;
-                    this.startTop = this.sheetTop;
-                    e.target.setPointerCapture(e.pointerId);
-
-                    const onPointerMove = (ev) => {
-                        if (!this.isDragging) return;
-                        let newTop = this.startTop + (ev.clientY - this.startY);
-                        if (newTop < 0) newTop = 0;
-                        if (newTop > this.headerHeight) newTop = this.headerHeight;
-                        this.sheetTop = newTop;
-                    };
-
-                    const onPointerUp = (ev) => {
-                        if (!this.isDragging) return;
-                        this.isDragging = false;
-                        e.target.releasePointerCapture(ev.pointerId);
-                        
-                        // Snap ke atas (0) atau bawah (headerHeight)
-                        const distToTop = Math.abs(this.sheetTop - 0);
-                        const distToBottom = Math.abs(this.sheetTop - this.headerHeight);
-                        this.sheetTop = distToTop < distToBottom ? 0 : this.headerHeight;
-
-                        document.removeEventListener('pointermove', onPointerMove);
-                        document.removeEventListener('pointerup', onPointerUp);
-                    };
-
-                    document.addEventListener('pointermove', onPointerMove);
-                    document.addEventListener('pointerup', onPointerUp);
-                },
-
-                // --- FUNGSI TAMBAH TRANSAKSI ---
-                toggleAllMembers() {
-                    if (this.form.members.length === this.$store.kas.members.length) {
-                        this.form.members = [];
-                    } else {
-                        this.form.members = [...this.$store.kas.members];
-                    }
-                },
-                submitTransaction() {
-                    const amount = parseInt(this.form.amount.replace(/\./g, ''), 10);
-                    if (!this.form.desc || isNaN(amount) || amount <= 0) return this.showToast('Isi dengan benar');
-                    if (this.form.type === 'in' && this.form.members.length === 0) return this.showToast('Pilih anggota');
-
-                    const newTx = {
-                        id: Date.now(),
-                        date: new Date().toISOString().slice(0, 10),
-                        type: this.form.type,
-                        amount: amount,
-                        desc: this.form.desc,
-                        members: this.form.members
-                    };
-
-                    // Update Store
-                    this.$store.kas.transactions.unshift(newTx);
-                    if (this.form.type === 'out') this.$store.kas.balance -= amount;
-                    else this.$store.kas.balance += amount;
-
-                    this.closeAddModal();
-                    this.showToast('Transaksi berhasil ditambahkan');
-                },
-                closeAddModal() {
-                    this.modals.add = false;
-                    // Reset form
-                    setTimeout(() => {
-                        this.form = { type: 'out', desc: '', amount: '', members: [] };
-                    }, 300);
-                },
-
-                // --- FUNGSI FILTER (COMPUTED PROPERTY) ---
-                get filteredTransactions() {
-                    return this.$store.kas.transactions.filter(tx => {
-                        let ok = true;
-                        if (this.filters.from && tx.date < this.filters.from) ok = false;
-                        if (this.filters.to && tx.date > this.filters.to) ok = false;
-                        if (this.filters.type !== 'all' && tx.type !== this.filters.type) ok = false;
-                        
-                        // Anggota hanya dicek jika jenisnya bukan pengeluaran
-                        if (this.filters.type !== 'out' && this.filters.member !== 'all') {
-                            if (!tx.members || !tx.members.includes(this.filters.member)) ok = false;
-                        }
-                        return ok;
-                    });
-                },
-                applyFilter() {
-                    this.modals.filter = false;
-                    this.showToast(`Filter diterapkan — ${this.filteredTransactions.length} transaksi ditampilkan`);
-                },
-                resetFilter() {
-                    this.filters = { from: '', to: '', type: 'all', member: 'all' };
-                },
-
-                // --- FUNGSI LAINNYA ---
-                printPDF() {
-                    this.showToast('Menyiapkan dokumen cetak PDF...');
-                    setTimeout(() => window.print(), 500);
-                },
-                showToast(message) {
-                    this.toast.message = message;
-                    this.toast.show = true;
-                    setTimeout(() => { this.toast.show = false; }, 2000);
-                }
-            }));
-        });
-    </script>
 </body>
 </html>
