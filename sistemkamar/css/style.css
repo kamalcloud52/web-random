@@ -5,6 +5,10 @@
     display: none !important; 
 }
 
+/* Durasi sedang agar panel terasa bergerak tanpa menunda interaksi. */
+.duration-600 { transition-duration: 600ms !important; }
+.duration-450 { transition-duration: 450ms !important; }
+
 /* ==========================================================================
    1. CUSTOM SCROLLBAR
    ========================================================================== */
@@ -62,6 +66,27 @@
     pointer-events: none;
     opacity: 0.4;
     filter: grayscale(1);
+}
+
+/* Dekorasi lembut pada header kartu profil anggota */
+.profile-orb {
+    position: absolute;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+}
+.profile-orb-one {
+    width: 12rem;
+    height: 12rem;
+    right: -3.5rem;
+    top: -5rem;
+}
+.profile-orb-two {
+    width: 8rem;
+    height: 8rem;
+    right: 4rem;
+    bottom: -6rem;
+    background: rgba(52, 211, 153, 0.14);
 }
 
 /* ==========================================================================
