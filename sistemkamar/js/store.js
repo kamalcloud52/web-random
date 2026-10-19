@@ -7,7 +7,7 @@ document.addEventListener('alpine:init', () => {
         
         // Data Dummy Awal
         transactions: [
-            { id: 1, date: '2026-10-08', type: 'out', amount: 20000, desc: 'Beli galon', members: ['Ni\'am'] },
+            { id: 1, date: '2026-10-08', type: 'out', amount: 20000, desc: 'Beli galon', members: [] },
             { id: 2, date: '2026-10-07', type: 'in', amount: 40000, desc: 'Iuran & utang', members: ['Fajar'] }
         ],
 
