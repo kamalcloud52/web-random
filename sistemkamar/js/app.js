@@ -2,7 +2,9 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('app', () => ({
         // State Modal
-        modals: { add: false, filter: false },
+        modals: { login: false, add: false, filter: false },
+        admin: { authenticated: false, username: '', password: '' },
+        selectedMember: null,
         
         // State Form
         form: { type: 'out', desc: '', amount: '', members: [] },
@@ -12,6 +14,7 @@ document.addEventListener('alpine:init', () => {
         
         // State Toast
         toast: { show: false, message: '' },
+        toastTimer: null,
 
         // State Drag (Bottom Sheet)
         sheetTop: 340,
@@ -61,6 +64,54 @@ document.addEventListener('alpine:init', () => {
         
         changeMonth(month) {
             this.$store.kas.activeMonth = month;
+        },
+
+        openMemberProfile(member) {
+            this.selectedMember = member;
+        },
+
+        get selectedMemberStats() {
+            if (!this.selectedMember) return { total: 0, count: 0, recent: [] };
+            const contributions = this.$store.kas.transactions.filter(tx =>
+                tx.type === 'in' && tx.members && tx.members.includes(this.selectedMember)
+            );
+            return {
+                total: contributions.reduce((sum, tx) => sum + Number(tx.amount || 0), 0),
+                count: contributions.length,
+                recent: contributions.slice(0, 3)
+            };
+        },
+
+        requestAddTransaction() {
+            if (this.admin.authenticated) {
+                this.modals.add = true;
+                return;
+            }
+            this.modals.login = true;
+        },
+
+        loginAdmin() {
+            const username = this.admin.username.trim();
+            const password = this.admin.password;
+            if (!username || !password) {
+                this.showToast('Masukkan username dan kata sandi admin');
+                return;
+            }
+
+            // Prototipe frontend: validasi ini akan diganti autentikasi Apps Script.
+            this.admin.authenticated = true;
+            this.admin.username = username;
+            this.admin.password = '';
+            this.modals.login = false;
+            this.modals.add = true;
+            this.showToast('Login admin berhasil');
+        },
+
+        logoutAdmin() {
+            this.admin.authenticated = false;
+            this.admin.username = '';
+            this.modals.add = false;
+            this.showToast('Anda telah keluar dari sesi admin');
         },
 
         moveTabIndicator() {
@@ -124,6 +175,11 @@ document.addEventListener('alpine:init', () => {
         },
 
         submitTransaction() {
+            if (!this.admin.authenticated) {
+                this.modals.add = false;
+                this.modals.login = true;
+                return;
+            }
             const amount = parseInt(this.form.amount.replace(/\./g, ''), 10);
             if (!this.form.desc || isNaN(amount) || amount <= 0) return this.showToast('Isi keterangan & nominal dengan benar');
             if (this.form.type === 'in' && this.form.members.length === 0) return this.showToast('Pilih minimal satu anggota');
@@ -134,7 +190,7 @@ document.addEventListener('alpine:init', () => {
                 type: this.form.type,
                 amount: amount,
                 desc: this.form.desc,
-                members: this.form.members
+                members: this.form.type === 'in' ? [...this.form.members] : []
             };
 
             // Panggil fungsi dari Store (store.js)
@@ -184,9 +240,13 @@ document.addEventListener('alpine:init', () => {
         },
 
         showToast(message) {
+            if (this.toastTimer) clearTimeout(this.toastTimer);
             this.toast.message = message;
             this.toast.show = true;
-            setTimeout(() => { this.toast.show = false; }, 2000);
+            this.toastTimer = setTimeout(() => {
+                this.toast.show = false;
+                this.toastTimer = null;
+            }, 2600);
         }
     }));
 });
