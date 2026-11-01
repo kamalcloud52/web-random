@@ -7,8 +7,19 @@ window.formatRupiah = (number) => {
 
 // Format ISO Date ke tampilan cantik (Contoh: 2026-10-08 -> 08 Okt 2026)
 window.formatDate = (isoString) => {
-    const date = new Date(isoString);
+    const date = new Date(`${isoString}T00:00:00`);
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+window.formatMonth = (yearMonth) => {
+    const [year, month] = yearMonth.split('-').map(Number);
+    return new Date(year, month - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+};
+
+window.localISODate = () => {
+    const date = new Date();
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 10);
 };
 
 // Format input angka dengan titik (5000 -> 5.000)
