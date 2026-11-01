@@ -2,15 +2,20 @@
 document.addEventListener('alpine:init', () => {
     Alpine.data('app', () => ({
         // State Modal
-        modals: { login: false, add: false, filter: false },
+        modals: { login: false, add: false, filter: false, members: false },
         admin: { authenticated: false, username: '', password: '' },
+        memberForm: { id: '', name: '', room: '' },
+        editingMemberName: null,
+        connection: { mode: KasApi.isLive() ? 'apps-script' : 'demo', status: KasApi.isLive() ? 'loading' : 'demo', message: '' },
         selectedMember: null,
         
         // State Form
-        form: { type: 'out', desc: '', amount: '', members: [] },
+        form: { type: 'out', desc: '', amount: '', category: 'Lainnya', members: [] },
+        editingTransactionId: null,
         
         // State Filter
-        filters: { from: '', to: '', type: 'all', member: 'all' },
+        filters: { from: '', to: '', type: 'all', member: 'all', category: 'all', search: '' },
+        filterDraft: { from: '', to: '', type: 'all', member: 'all', category: 'all', search: '' },
         
         // State Toast
         toast: { show: false, message: '' },
@@ -28,6 +33,12 @@ document.addEventListener('alpine:init', () => {
 
         // Lifecycle: Berjalan otomatis saat halaman pertama kali dimuat
         init() {
+            if (KasApi.isLive()) {
+                this.$store.kas.openingBalance = 0;
+                this.$store.kas.transactions = [];
+                this.$store.kas.members = [];
+                this.loadRemoteData();
+            }
             this.$nextTick(() => {
                 // 1. Hitung tinggi header untuk posisi awal sheet riwayat
                 this.headerHeight = document.getElementById('headerArea').offsetHeight;
@@ -57,6 +68,32 @@ document.addEventListener('alpine:init', () => {
             });
         },
 
+        normalizeTransaction(tx) {
+            return { ...tx, desc: tx.desc || tx.description || '', category: tx.category || 'Lainnya', members: Array.isArray(tx.members) ? tx.members : [] };
+        },
+
+        async loadRemoteData() {
+            this.connection.status = 'loading';
+            try {
+                const response = await KasApi.getBootstrap();
+                const data = response.data || response;
+                this.$store.kas.openingBalance = Number(data.openingBalance || 0);
+                this.$store.kas.transactions = (data.transactions || []).map(tx => this.normalizeTransaction(tx));
+                this.$store.kas.members = (data.members || []).map(member => typeof member === 'string' ? member : member.name);
+                this.$store.kas.memberProfiles = Object.fromEntries((data.members || []).filter(member => typeof member !== 'string').map(member => [member.name, member]));
+                const months = this.$store.kas.transactions.map(tx => tx.date.slice(0, 7)).sort();
+                if (months.length) this.$store.kas.activeMonth = months[months.length - 1];
+                this.$store.kas.categories = [...new Set(['Iuran', 'Belanja', 'Perlengkapan', 'Perbaikan', 'Lainnya', ...this.$store.kas.transactions.map(tx => tx.category)])];
+                this.connection.status = 'ready';
+                this.connection.message = '';
+                this.$nextTick(() => this.moveTabIndicator());
+            } catch (error) {
+                this.connection.status = 'error';
+                this.connection.message = error.message;
+                this.showToast(`Gagal memuat data: ${error.message}`);
+            }
+        },
+
         // --- UI & LOGIC TAB BULAN ---
         get activeMonth() {
             return this.$store.kas.activeMonth;
@@ -66,8 +103,77 @@ document.addEventListener('alpine:init', () => {
             this.$store.kas.activeMonth = month;
         },
 
+        get availableMonths() {
+            const months = new Set(this.$store.kas.transactions.map(tx => tx.date.slice(0, 7)));
+            months.add(this.$store.kas.activeMonth);
+            return [...months].sort((a, b) => b.localeCompare(a));
+        },
+
+        get monthlySummary() {
+            const transactions = this.$store.kas.transactions.filter(tx => tx.date.slice(0, 7) === this.activeMonth);
+            return transactions.reduce((summary, tx) => {
+                summary[tx.type === 'in' ? 'income' : 'expense'] += Number(tx.amount || 0);
+                summary.count += 1;
+                return summary;
+            }, { income: 0, expense: 0, count: 0 });
+        },
+
         openMemberProfile(member) {
             this.selectedMember = member;
+        },
+
+        get selectedMemberProfile() {
+            return this.selectedMember ? (this.$store.kas.memberProfiles[this.selectedMember] || {}) : {};
+        },
+
+        editMember(member = null) {
+            if (!this.admin.authenticated) return this.showToast('Login admin diperlukan untuk mengelola anggota');
+            const profile = member ? (this.$store.kas.memberProfiles[member] || {}) : {};
+            this.memberForm = { id: profile.id || '', name: member || '', room: profile.room || '' };
+            this.editingMemberName = member;
+            this.modals.members = true;
+        },
+
+        async saveMember() {
+            const name = this.memberForm.name.trim();
+            if (!name) return this.showToast('Nama anggota wajib diisi');
+            if (this.$store.kas.members.some(item => item.toLowerCase() === name.toLowerCase() && item !== this.editingMemberName)) {
+                return this.showToast('Nama anggota sudah terdaftar');
+            }
+            try {
+                const input = { ...this.memberForm, name };
+                const saved = KasApi.isLive() ? (await KasApi.saveMember(input)).member : { ...input, active: true };
+                const oldName = this.editingMemberName;
+                if (oldName && oldName !== name) this.$store.kas.members = this.$store.kas.members.map(item => item === oldName ? name : item);
+                else if (!oldName) this.$store.kas.members.push(name);
+                if (oldName && oldName !== name) {
+                    this.$store.kas.transactions = this.$store.kas.transactions.map(tx => ({
+                        ...tx,
+                        members: (tx.members || []).map(item => item === oldName ? name : item)
+                    }));
+                }
+                if (oldName && oldName !== name) delete this.$store.kas.memberProfiles[oldName];
+                this.$store.kas.memberProfiles[name] = saved;
+                this.editingMemberName = null;
+                this.memberForm = { id: '', name: '', room: '' };
+                this.modals.members = false;
+                this.showToast('Data anggota berhasil disimpan');
+            } catch (error) {
+                this.showToast(`Gagal menyimpan anggota: ${error.message}`);
+            }
+        },
+
+        async archiveMember(member) {
+            const profile = this.$store.kas.memberProfiles[member] || {};
+            if (!window.confirm(`Arsipkan anggota ${member}? Riwayat transaksinya tetap disimpan.`)) return;
+            try {
+                if (KasApi.isLive()) await KasApi.archiveMember(profile.id);
+                this.$store.kas.members = this.$store.kas.members.filter(item => item !== member);
+                delete this.$store.kas.memberProfiles[member];
+                this.showToast('Anggota diarsipkan; riwayat tetap tersimpan');
+            } catch (error) {
+                this.showToast(`Gagal mengarsipkan anggota: ${error.message}`);
+            }
         },
 
         get selectedMemberStats() {
@@ -90,7 +196,22 @@ document.addEventListener('alpine:init', () => {
             this.modals.login = true;
         },
 
-        loginAdmin() {
+        async loginAdmin() {
+            if (KasApi.isLive()) {
+                try {
+                    const session = await KasApi.getSession();
+                    if (!session.signedIn) return this.showToast('Masuk ke akun Google Anda terlebih dahulu');
+                    if (!session.isAdmin) return this.showToast('Akun Google ini belum terdaftar sebagai admin');
+                    this.admin.authenticated = true;
+                    this.admin.username = session.email;
+                    this.modals.login = false;
+                    this.modals.add = true;
+                    this.showToast('Akses admin terverifikasi');
+                } catch (error) {
+                    this.showToast(`Login gagal: ${error.message}`);
+                }
+                return;
+            }
             const username = this.admin.username.trim();
             const password = this.admin.password;
             if (!username || !password) {
@@ -174,7 +295,7 @@ document.addEventListener('alpine:init', () => {
             }
         },
 
-        submitTransaction() {
+        async submitTransaction() {
             if (!this.admin.authenticated) {
                 this.modals.add = false;
                 this.modals.login = true;
@@ -184,37 +305,80 @@ document.addEventListener('alpine:init', () => {
             if (!this.form.desc || isNaN(amount) || amount <= 0) return this.showToast('Isi keterangan & nominal dengan benar');
             if (this.form.type === 'in' && this.form.members.length === 0) return this.showToast('Pilih minimal satu anggota');
 
+            const existing = this.editingTransactionId
+                ? this.$store.kas.transactions.find(tx => String(tx.id) === String(this.editingTransactionId))
+                : null;
             const newTx = {
-                id: Date.now(),
-                date: new Date().toISOString().slice(0, 10),
+                id: existing ? existing.id : Date.now(),
+                date: existing ? existing.date : localISODate(),
                 type: this.form.type,
                 amount: amount,
                 desc: this.form.desc,
+                category: this.form.category,
                 members: this.form.type === 'in' ? [...this.form.members] : []
             };
 
-            // Panggil fungsi dari Store (store.js)
-            this.$store.kas.addTransaction(newTx);
+            try {
+                let saved = newTx;
+                if (KasApi.isLive()) {
+                    const response = await KasApi.saveTransaction({ ...newTx, description: newTx.desc });
+                    saved = this.normalizeTransaction(response.transaction || newTx);
+                }
+                if (existing) this.$store.kas.updateTransaction(saved);
+                else {
+                    this.$store.kas.addTransaction(saved);
+                    this.$store.kas.activeMonth = saved.date.slice(0, 7);
+                }
+                this.closeAddModal();
+                this.showToast(existing ? 'Transaksi berhasil diperbarui' : 'Transaksi berhasil ditambahkan');
+            } catch (error) {
+                this.showToast(`Gagal menyimpan transaksi: ${error.message}`);
+            }
+        },
 
-            this.closeAddModal();
-            this.showToast('Transaksi berhasil ditambahkan');
+        editTransaction(tx) {
+            if (!this.admin.authenticated) return this.showToast('Login admin diperlukan untuk mengubah transaksi');
+            this.editingTransactionId = tx.id;
+            this.form = { type: tx.type, desc: tx.desc, amount: Number(tx.amount).toLocaleString('id-ID'), category: tx.category || 'Lainnya', members: [...(tx.members || [])] };
+            this.modals.add = true;
+        },
+
+        async deleteTransaction(tx) {
+            if (!this.admin.authenticated) return this.showToast('Login admin diperlukan untuk menghapus transaksi');
+            if (!window.confirm(`Hapus transaksi “${tx.desc}” sebesar ${formatRupiah(tx.amount)}?`)) return;
+            try {
+                if (KasApi.isLive()) await KasApi.deleteTransaction(tx.id);
+                this.$store.kas.deleteTransaction(tx.id);
+                this.showToast('Transaksi dihapus');
+            } catch (error) {
+                this.showToast(`Gagal menghapus transaksi: ${error.message}`);
+            }
         },
 
         closeAddModal() {
             this.modals.add = false;
-            // Reset form setelah animasi tutup selesai (300ms)
+            // Reset form setelah transisi modal selesai.
             setTimeout(() => {
-                this.form = { type: 'out', desc: '', amount: '', members: [] };
-            }, 300); 
+                this.form = { type: 'out', desc: '', amount: '', category: 'Lainnya', members: [] };
+                this.editingTransactionId = null;
+            }, 700); 
+        },
+
+        openFilters() {
+            this.filterDraft = { ...this.filters };
+            this.modals.filter = true;
         },
 
         // --- LOGIC FILTER (COMPUTED PROPERTY) ---
         get filteredTransactions() {
             return this.$store.kas.transactions.filter(tx => {
                 let ok = true;
+                if (tx.date.slice(0, 7) !== this.activeMonth) ok = false;
                 if (this.filters.from && tx.date < this.filters.from) ok = false;
                 if (this.filters.to && tx.date > this.filters.to) ok = false;
                 if (this.filters.type !== 'all' && tx.type !== this.filters.type) ok = false;
+                if (this.filters.category !== 'all' && (tx.category || 'Lainnya') !== this.filters.category) ok = false;
+                if (this.filters.search && !`${tx.desc} ${tx.category || ''}`.toLowerCase().includes(this.filters.search.toLowerCase())) ok = false;
                 
                 // Anggota hanya dicek jika jenisnya bukan pengeluaran
                 if (this.filters.type !== 'out' && this.filters.member !== 'all') {
@@ -225,12 +389,18 @@ document.addEventListener('alpine:init', () => {
         },
 
         applyFilter() {
+            if (this.filterDraft.from && this.filterDraft.to && this.filterDraft.from > this.filterDraft.to) {
+                return this.showToast('Tanggal awal tidak boleh melewati tanggal akhir');
+            }
+            this.filters = { ...this.filterDraft };
             this.modals.filter = false;
             this.showToast(`Filter diterapkan — ${this.filteredTransactions.length} transaksi ditampilkan`);
         },
 
         resetFilter() {
-            this.filters = { from: '', to: '', type: 'all', member: 'all' };
+            const defaults = { from: '', to: '', type: 'all', member: 'all', category: 'all', search: '' };
+            this.filters = { ...defaults };
+            this.filterDraft = { ...defaults };
         },
 
         // --- UTILITIES ---
