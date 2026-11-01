@@ -35,6 +35,7 @@
     </script>
 
     <script defer src="js/utils.js"></script>
+    <script defer src="js/api.js"></script>
     <script defer src="js/store.js"></script>
     <script defer src="js/app.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -49,12 +50,20 @@
             <div class="text-center relative z-10">
                 <h1 class="text-2xl font-extrabold tracking-tight text-white">Kas KamarSeqawan</h1>
                 <p class="text-xs font-semibold text-emerald-200/80 tracking-wide mt-0.5">PP Rahmatan Lil 'Alamin</p>
-                <button x-show="admin.authenticated" @click="logoutAdmin()" x-cloak class="mt-2 text-[10px] font-semibold text-emerald-100/80 hover:text-white underline underline-offset-2">Keluar dari admin</button>
+                <div x-show="admin.authenticated" x-cloak class="mt-2 flex items-center justify-center gap-3">
+                    <button @click="editMember()" class="text-[10px] font-semibold text-emerald-100/80 hover:text-white underline underline-offset-2">Kelola anggota</button>
+                    <button @click="logoutAdmin()" class="text-[10px] font-semibold text-emerald-100/80 hover:text-white underline underline-offset-2">Keluar</button>
+                </div>
             </div>
 
             <div class="mt-5 text-center relative z-10">
                 <span class="text-xs font-medium uppercase tracking-widest text-emerald-200/70 block">Saldo</span>
                 <div class="text-3xl font-black text-white mt-0.5 tracking-tight" x-text="formatRupiah($store.kas.balance)"></div>
+                <span x-show="connection.status === 'demo'" class="inline-flex mt-2 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[9px] font-semibold tracking-wide text-emerald-100/80">MODE PRATINJAU · DATA CONTOH</span>
+                <span x-show="connection.status === 'loading'" x-cloak class="inline-flex mt-2 rounded-full border border-white/10 bg-white/10 px-2.5 py-1 text-[9px] font-semibold tracking-wide text-emerald-100/80"><i class="fa-solid fa-spinner fa-spin mr-1"></i> MEMUAT DATA</span>
+                <span x-show="connection.status === 'ready'" x-cloak class="inline-flex mt-2 rounded-full border border-emerald-200/20 bg-emerald-300/10 px-2.5 py-1 text-[9px] font-semibold tracking-wide text-emerald-100"><i class="fa-solid fa-cloud mr-1"></i> TERSAMBUNG</span>
+                <span x-show="connection.status === 'error'" x-cloak class="inline-flex mt-2 rounded-full border border-red-200/20 bg-red-300/10 px-2.5 py-1 text-[9px] font-semibold tracking-wide text-red-100"><i class="fa-solid fa-triangle-exclamation mr-1"></i> GAGAL MEMUAT</span>
+                <button x-show="connection.status === 'error'" x-cloak @click="loadRemoteData()" class="ml-1 text-[9px] font-bold text-white underline underline-offset-2">Coba lagi</button>
             </div>
 
             <div class="mt-5 text-center relative z-10">
@@ -97,16 +106,27 @@
                 </div>
 
                 <div class="relative flex items-center justify-between border-b border-slate-200 mb-4 text-xs font-semibold text-slate-500">
-                    <div id="monthTabs" class="relative flex gap-4">
-                        <button @click="changeMonth('Agustus')"   id="tab-Agustus"   :class="activeMonth === 'Agustus' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors">Agustus</button>
-                        <button @click="changeMonth('September')" id="tab-September" :class="activeMonth === 'September' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors">September</button>
-                        <button @click="changeMonth('Oktober')"   id="tab-Oktober"   :class="activeMonth === 'Oktober' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors">Oktober</button>
+                    <div id="monthTabs" class="relative flex max-w-[72%] gap-4 overflow-x-auto no-scrollbar">
+                        <template x-for="month in availableMonths" :key="month">
+                            <button @click="changeMonth(month)" :id="`tab-${month}`" :class="activeMonth === month ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'" class="pb-3 relative text-xs font-semibold transition-colors whitespace-nowrap" x-text="formatMonth(month)"></button>
+                        </template>
                         <span id="tabIndicator" class="absolute left-0 -bottom-[1px] h-[2px] bg-slate-900" :style="indicatorStyle"></span>
                     </div>
-                    <button @click="modals.filter = true" class="no-print flex items-center gap-1 text-slate-600 hover:text-brand-600 pb-3">
+                    <button @click="openFilters()" class="no-print flex items-center gap-1 text-slate-600 hover:text-brand-600 pb-3">
                         <i class="fa-solid fa-sliders text-[10px]"></i>
                         <span>Filter</span>
                     </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="rounded-xl bg-emerald-50 px-3 py-2.5">
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-emerald-700/70">Pemasukan bulan ini</p>
+                        <p class="mt-0.5 text-sm font-extrabold text-emerald-800" x-text="formatRupiah(monthlySummary.income)"></p>
+                    </div>
+                    <div class="rounded-xl bg-red-50 px-3 py-2.5">
+                        <p class="text-[9px] font-bold uppercase tracking-wider text-red-700/70">Pengeluaran bulan ini</p>
+                        <p class="mt-0.5 text-sm font-extrabold text-red-700" x-text="formatRupiah(monthlySummary.expense)"></p>
+                    </div>
                 </div>
 
                 <div class="space-y-4">
@@ -119,15 +139,19 @@
                                          :class="tx.type === 'out' ? 'bg-red-50 text-red-500' : 'bg-emerald-50 text-emerald-600'">
                                         <i class="fa-solid" :class="tx.type === 'out' ? 'fa-arrow-up' : 'fa-arrow-down'"></i>
                                     </div>
-                                    <div>
+                                    <div class="min-w-0">
                                         <h3 class="font-bold text-slate-800 text-sm leading-tight" x-text="tx.type === 'out' ? 'Pengeluaran' : 'Pemasukan'"></h3>
-                                    <p class="text-xs text-slate-400 font-medium mt-0.5" x-text="tx.desc + (tx.type === 'in' && tx.members && tx.members.length ? ' • ' + tx.members.join(', ') : '')"></p>
+                                        <p class="text-xs text-slate-400 font-medium mt-0.5 truncate" x-text="tx.desc + ' · ' + (tx.category || 'Lainnya') + (tx.type === 'in' && tx.members && tx.members.length ? ' • ' + tx.members.join(', ') : '')"></p>
                                     </div>
                                 </div>
-                                <div class="text-right">
+                                <div class="text-right flex-shrink-0 ml-2">
                                     <span class="font-bold text-sm block" :class="tx.type === 'out' ? 'text-red-500' : 'text-emerald-600'">
                                         <span x-text="tx.type === 'out' ? '-' : '+'"></span> <span x-text="formatRupiah(tx.amount)"></span>
                                     </span>
+                                    <div x-show="admin.authenticated" class="no-print flex justify-end gap-2 mt-1">
+                                        <button @click="editTransaction(tx)" :aria-label="'Edit transaksi ' + tx.desc" class="text-[10px] font-semibold text-slate-500 hover:text-brand-700">Edit</button>
+                                        <button @click="deleteTransaction(tx)" :aria-label="'Hapus transaksi ' + tx.desc" class="text-[10px] font-semibold text-slate-500 hover:text-red-600">Hapus</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -153,10 +177,10 @@
 
     <!-- ================= MODAL: Biodata Anggota ================= -->
     <div x-show="selectedMember" x-cloak class="no-print fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
          @click="selectedMember = null">
-        <section x-show="selectedMember" @click.stop class="relative w-full max-w-md overflow-hidden rounded-t-[2rem] sm:rounded-[2rem] bg-white shadow-2xl"
-                 x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
-                 x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+        <section @click.stop class="relative w-full max-w-md overflow-hidden rounded-t-[2rem] sm:rounded-[2rem] bg-white shadow-2xl">
             <div class="relative overflow-hidden bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-900 px-6 pt-6 pb-10 text-white">
                 <div class="profile-orb profile-orb-one"></div><div class="profile-orb profile-orb-two"></div>
                 <div class="relative z-10 flex items-start justify-between">
@@ -167,7 +191,8 @@
                     <div class="w-[4.5rem] h-[4.5rem] rounded-[1.5rem] border border-white/25 bg-white/15 shadow-lg flex items-center justify-center text-2xl font-extrabold" x-text="selectedMember ? selectedMember.charAt(0).toUpperCase() : ''"></div>
                     <div>
                         <h3 class="text-2xl font-extrabold tracking-tight" x-text="selectedMember"></h3>
-                        <p class="text-xs text-emerald-100/80 mt-1"><i class="fa-solid fa-circle-check mr-1"></i> Anggota KamarSeqawan</p>
+                    <p class="text-xs text-emerald-100/80 mt-1"><i class="fa-solid fa-circle-check mr-1"></i> Anggota KamarSeqawan</p>
+                    <p x-show="selectedMemberProfile.room" class="text-[11px] text-emerald-100/70 mt-1" x-text="'Kamar ' + selectedMemberProfile.room"></p>
                     </div>
                 </div>
             </div>
@@ -208,48 +233,80 @@
         </section>
     </div>
 
+    <!-- ================= MODAL: Kelola Anggota ================= -->
+    <div x-show="modals.members" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
+         @click="modals.members = false">
+        <section @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div class="flex items-center justify-between mb-5">
+                <div><h3 class="text-base font-bold text-slate-800">Kelola Anggota</h3><p class="text-xs text-slate-500 mt-1">Perbarui nama dan informasi kamar.</p></div>
+                <button @click="modals.members = false" aria-label="Tutup" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form @submit.prevent="saveMember()" class="space-y-3 rounded-2xl bg-slate-50 p-4 mb-5">
+                <p class="text-xs font-bold text-slate-700" x-text="editingMemberName ? 'Edit anggota' : 'Tambah anggota'"></p>
+                <input type="text" x-model="memberForm.name" maxlength="80" required placeholder="Nama anggota" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-brand-600">
+                <input type="text" x-model="memberForm.room" maxlength="40" placeholder="Kamar (opsional)" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:border-brand-600">
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white" x-text="editingMemberName ? 'Simpan perubahan' : 'Tambah anggota'"></button>
+                    <button x-show="editingMemberName" type="button" @click="editingMemberName = null; memberForm = { id: '', name: '', room: '' }" class="px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-600">Batal</button>
+                </div>
+            </form>
+            <div class="space-y-2">
+                <template x-for="member in $store.kas.members" :key="member">
+                    <div class="flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2.5">
+                        <div class="min-w-0"><p class="truncate text-xs font-bold text-slate-700" x-text="member"></p><p class="text-[10px] text-slate-400" x-text="$store.kas.memberProfiles[member]?.room ? 'Kamar ' + $store.kas.memberProfiles[member].room : 'Anggota aktif'"></p></div>
+                        <div class="ml-3 flex gap-3"><button @click="editMember(member)" class="text-[10px] font-bold text-brand-700">Edit</button><button @click="archiveMember(member)" class="text-[10px] font-bold text-red-600">Arsipkan</button></div>
+                    </div>
+                </template>
+                <p x-show="$store.kas.members.length === 0" class="py-5 text-center text-xs text-slate-400">Belum ada anggota terdaftar.</p>
+            </div>
+        </section>
+    </div>
+
     <!-- ================= MODAL: Login Admin ================= -->
     <div x-show="modals.login" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
          @click="modals.login = false">
-        <div x-show="modals.login" @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl"
-             x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+        <div @click.stop class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl">
             <div class="flex justify-between items-start mb-5">
                 <div>
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 text-brand-700 flex items-center justify-center mb-3"><i class="fa-solid fa-shield-halved"></i></div>
                     <h3 class="text-base font-bold text-slate-800">Login Admin</h3>
-                    <p class="text-xs text-slate-500 mt-1">Masuk untuk menambahkan transaksi kas.</p>
+                    <p class="text-xs text-slate-500 mt-1" x-text="connection.mode === 'apps-script' ? 'Akses admin diverifikasi melalui akun Google.' : 'Masuk untuk menambahkan transaksi kas.'"></p>
                 </div>
                 <button @click="modals.login = false" aria-label="Tutup login" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
             <form @submit.prevent="loginAdmin()" class="space-y-3">
-                <div>
+                <div x-show="connection.mode === 'demo'">
                     <label for="adminUsername" class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
-                    <input id="adminUsername" type="text" x-model="admin.username" autocomplete="username" placeholder="Username admin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+                    <input id="adminUsername" type="text" x-model="admin.username" autocomplete="username" placeholder="Username admin" :required="connection.mode === 'demo'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
-                <div>
+                <div x-show="connection.mode === 'demo'">
                     <label for="adminPassword" class="block text-xs font-semibold text-slate-600 mb-1">Kata sandi</label>
-                    <input id="adminPassword" type="password" x-model="admin.password" autocomplete="current-password" placeholder="Kata sandi admin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+                    <input id="adminPassword" type="password" x-model="admin.password" autocomplete="current-password" placeholder="Kata sandi admin" :required="connection.mode === 'demo'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
-                <p class="text-[10px] text-slate-400">Login frontend sementara; autentikasi akan dihubungkan ke Apps Script.</p>
-                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 shadow-md transition-colors">Masuk dan lanjutkan</button>
+                <p x-show="connection.mode === 'demo'" class="text-[10px] text-slate-400">Login simulasi untuk pratinjau; data belum tersimpan di Spreadsheet.</p>
+                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 shadow-md transition-colors" x-text="connection.mode === 'apps-script' ? 'Verifikasi akun Google' : 'Masuk dan lanjutkan'"></button>
             </form>
         </div>
     </div>
 
     <!-- ================= MODAL: Tambah Transaksi ================= -->
     <!-- PEMBUNGKUS LUAR (Overlay) -->
-    <div x-show="modals.add" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" 
+    <div x-show="modals.add" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
          @click="closeAddModal()">
         
-        <!-- ISI MODAL (Card Putih) - WAJIB ada x-show="modals.add" di sini agar animasinya jalan -->
-        <div @click.stop x-show="modals.add" x-cloak 
+        <!-- Isi kartu transaksi; transisi dikendalikan oleh pembungkus modal. -->
+        <div @click.stop
              class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar transform"
-             x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+             >
             
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-slate-800">Tambah Transaksi Baru</h3>
+                <h3 class="text-base font-bold text-slate-800" x-text="editingTransactionId ? 'Edit Transaksi' : 'Tambah Transaksi Baru'"></h3>
                 <button @click="closeAddModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
@@ -277,6 +334,13 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Sub-keterangan</label>
                     <input type="text" x-model="form.desc" placeholder="Contoh: Beli galon / Iuran & utang" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Kategori</label>
+                    <select x-model="form.category" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+                        <template x-for="category in $store.kas.categories" :key="category"><option :value="category" x-text="category"></option></template>
+                    </select>
                 </div>
 
                 <div>
@@ -309,13 +373,14 @@
     <!-- ================= MODAL: Filter ================= -->
     <!-- PEMBUNGKUS LUAR (Overlay) -->
     <div x-show="modals.filter" x-cloak class="no-print fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+         x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
+         x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full"
          @click="modals.filter = false">
         
-        <!-- ISI MODAL (Card Putih) - WAJIB ada x-show="modals.filter" di sini juga -->
-        <div @click.stop x-show="modals.filter" x-cloak 
+        <!-- Isi kartu filter; transisi dikendalikan oleh pembungkus modal. -->
+        <div @click.stop
              class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto no-scrollbar transform"
-             x-transition:enter="transition-transform duration-600 ease-out" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition-transform duration-450 ease-in" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+             >
             
             <div class="flex justify-between items-center mb-5">
                 <h3 class="text-base font-bold text-slate-800">Filter Transaksi</h3>
@@ -325,15 +390,20 @@
             </div>
 
             <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Cari keterangan</label>
+                <input type="search" x-model="filterDraft.search" placeholder="Contoh: galon, iuran..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+            </div>
+
+            <div class="mb-4">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Rentang Tanggal</label>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <span class="block text-[10px] text-slate-400 font-medium mb-1">Dari</span>
-                        <input type="date" x-model="filters.from" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-xs text-slate-700">
+                        <input type="date" x-model="filterDraft.from" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-xs text-slate-700">
                     </div>
                     <div>
                         <span class="block text-[10px] text-slate-400 font-medium mb-1">Sampai</span>
-                        <input type="date" x-model="filters.to" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-xs text-slate-700">
+                        <input type="date" x-model="filterDraft.to" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-xs text-slate-700">
                     </div>
                 </div>
             </div>
@@ -342,35 +412,43 @@
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Jenis Transaksi</label>
                 <div class="grid grid-cols-3 gap-2">
                     <label class="cursor-pointer">
-                        <input type="radio" x-model="filters.type" value="all" class="peer hidden">
+                        <input type="radio" x-model="filterDraft.type" value="all" class="peer hidden">
                         <div class="p-2 text-center border-2 border-slate-200 rounded-xl peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 font-semibold text-[11px] text-slate-600">Semua</div>
                     </label>
                     <label class="cursor-pointer">
-                        <input type="radio" x-model="filters.type" value="out" class="peer hidden">
+                        <input type="radio" x-model="filterDraft.type" value="out" class="peer hidden">
                         <div class="p-2 text-center border-2 border-slate-200 rounded-xl peer-checked:border-red-500 peer-checked:bg-red-50/50 peer-checked:text-red-600 font-semibold text-[11px] text-slate-600">Pengeluaran</div>
                     </label>
                     <label class="cursor-pointer">
-                        <input type="radio" x-model="filters.type" value="in" class="peer hidden">
+                        <input type="radio" x-model="filterDraft.type" value="in" class="peer hidden">
                         <div class="p-2 text-center border-2 border-slate-200 rounded-xl peer-checked:border-emerald-500 peer-checked:bg-emerald-50/50 peer-checked:text-emerald-600 font-semibold text-[11px] text-slate-600">Pemasukan</div>
                     </label>
                 </div>
             </div>
 
-            <div class="mb-5 transition-opacity duration-200" :class="{ 'opacity-60': filters.type === 'out' }">
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-600 mb-1.5">Kategori</label>
+                <select x-model="filterDraft.category" class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-xs text-slate-700">
+                    <option value="all">Semua kategori</option>
+                    <template x-for="category in $store.kas.categories" :key="category"><option :value="category" x-text="category"></option></template>
+                </select>
+            </div>
+
+            <div class="mb-5 transition-opacity duration-200" :class="{ 'opacity-60': filterDraft.type === 'out' }">
                 <label class="block text-xs font-semibold text-slate-600 mb-1.5">Anggota</label>
                 <div class="grid grid-cols-3 gap-2">
-                    <label class="cursor-pointer" :class="{ 'member-choice is-disabled': filters.type === 'out' }">
-                        <input type="radio" x-model="filters.member" value="all" class="peer hidden">
+                    <label class="cursor-pointer" :class="{ 'member-choice is-disabled': filterDraft.type === 'out' }">
+                        <input type="radio" x-model="filterDraft.member" value="all" class="peer hidden">
                         <div class="p-2 text-center border-2 border-slate-200 rounded-xl peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 font-semibold text-[11px] text-slate-600">Semua</div>
                     </label>
                     <template x-for="member in $store.kas.members" :key="member">
-                        <label class="cursor-pointer" :class="{ 'member-choice is-disabled': filters.type === 'out' }">
-                            <input type="radio" x-model="filters.member" :value="member" class="peer hidden">
+                        <label class="cursor-pointer" :class="{ 'member-choice is-disabled': filterDraft.type === 'out' }">
+                            <input type="radio" x-model="filterDraft.member" :value="member" class="peer hidden">
                             <div class="p-2 text-center border-2 border-slate-200 rounded-xl peer-checked:border-brand-600 peer-checked:bg-brand-50 peer-checked:text-brand-700 font-semibold text-[11px] text-slate-600" x-text="member"></div>
                         </label>
                     </template>
                 </div>
-                <p x-show="filters.type === 'out'" class="text-[10px] text-slate-400 mt-1.5">Pengeluaran tidak terikat anggota, jadi pilihan ini tidak berlaku.</p>
+                <p x-show="filterDraft.type === 'out'" class="text-[10px] text-slate-400 mt-1.5">Pengeluaran tidak terikat anggota, jadi pilihan ini tidak berlaku.</p>
             </div>
 
             <div class="flex gap-3 pt-1">
