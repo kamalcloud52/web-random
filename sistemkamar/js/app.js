@@ -6,7 +6,7 @@ document.addEventListener('alpine:init', () => {
         admin: { authenticated: false, username: '', password: '' },
         memberForm: { id: '', name: '', room: '' },
         editingMemberName: null,
-        connection: { mode: KasApi.isLive() ? 'apps-script' : 'demo', status: KasApi.isLive() ? 'loading' : 'demo', message: '' },
+        connection: { mode: KasApi.mode, status: KasApi.isLive() ? 'loading' : 'demo', message: '' },
         selectedMember: null,
         
         // State Form
@@ -38,6 +38,11 @@ document.addEventListener('alpine:init', () => {
                 this.$store.kas.transactions = [];
                 this.$store.kas.members = [];
                 this.loadRemoteData();
+                if (KasApi.mode === 'cloudflare') {
+                    KasApi.getSession().then(session => {
+                        this.admin.authenticated = Boolean(session.authenticated);
+                    }).catch(() => { this.admin.authenticated = false; });
+                }
             }
             this.$nextTick(() => {
                 // 1. Hitung tinggi header untuk posisi awal sheet riwayat
@@ -197,6 +202,21 @@ document.addEventListener('alpine:init', () => {
         },
 
         async loginAdmin() {
+            if (KasApi.mode === 'cloudflare') {
+                if (!this.admin.password) return this.showToast('Masukkan kata sandi admin');
+                try {
+                    await KasApi.login(this.admin.password);
+                    this.admin.authenticated = true;
+                    this.admin.password = '';
+                    this.modals.login = false;
+                    this.modals.add = true;
+                    this.showToast('Login admin berhasil');
+                } catch (error) {
+                    this.admin.password = '';
+                    this.showToast(`Login gagal: ${error.message}`);
+                }
+                return;
+            }
             if (KasApi.isLive()) {
                 try {
                     const session = await KasApi.getSession();
@@ -228,7 +248,10 @@ document.addEventListener('alpine:init', () => {
             this.showToast('Login admin berhasil');
         },
 
-        logoutAdmin() {
+        async logoutAdmin() {
+            if (KasApi.mode === 'cloudflare') {
+                try { await KasApi.logout(); } catch (error) { this.showToast(`Gagal keluar: ${error.message}`); }
+            }
             this.admin.authenticated = false;
             this.admin.username = '';
             this.modals.add = false;
