@@ -1,35 +1,38 @@
-// js/store.js
-document.addEventListener('alpine:init', () => {
-    Alpine.store('kas', {
-        openingBalance: 100000,
-        members: ['Ni\'am', 'Fajar', 'Nazim', 'Ahsan', 'Kazul'],
-        memberProfiles: {},
-        activeMonth: '2026-10',
-        categories: ['Iuran', 'Belanja', 'Perlengkapan', 'Perbaikan', 'Lainnya'],
-        
-        // Data Dummy Awal
-        transactions: [
-            { id: 1, date: '2026-10-08', type: 'out', amount: 20000, desc: 'Beli galon', category: 'Belanja', members: [] },
-            { id: 2, date: '2026-10-07', type: 'in', amount: 40000, desc: 'Iuran & utang', category: 'Iuran', members: ['Fajar'] }
-        ],
+// js/utils.js
 
-        get balance() {
-            return this.transactions.reduce((balance, tx) =>
-                balance + (tx.type === 'in' ? Number(tx.amount) : -Number(tx.amount)), this.openingBalance);
-        },
+// Format ke Rupiah
+window.formatRupiah = (number) => {
+    return 'Rp. ' + number.toLocaleString('id-ID');
+};
 
-        // Fungsi Mutasi Data
-        addTransaction(tx) {
-            this.transactions.unshift(tx);
-        },
+// Format ISO Date ke tampilan cantik (Contoh: 2026-10-08 -> 08 Okt 2026)
+window.formatDate = (isoString) => {
+    const date = new Date(`${isoString}T00:00:00`);
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+};
 
-        updateTransaction(updated) {
-            const index = this.transactions.findIndex(tx => String(tx.id) === String(updated.id));
-            if (index >= 0) this.transactions.splice(index, 1, updated);
-        },
+window.formatMonth = (yearMonth) => {
+    const [year, month] = yearMonth.split('-').map(Number);
+    return new Date(year, month - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+};
 
-        deleteTransaction(id) {
-            this.transactions = this.transactions.filter(tx => String(tx.id) !== String(id));
-        }
-    });
-});
+window.localISODate = () => {
+    const date = new Date();
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+};
+
+// Format input angka dengan titik (5000 -> 5.000)
+window.formatInputRibuan = function(e) {
+    let digits = e.target.value.replace(/\D/g, '');
+    if (digits === '') {
+        e.target.value = '';
+        // Update state Alpine jika elemen ini terikat x-model
+        if (e.target._x_model) e.target._x_model.set('');
+        return;
+    }
+    digits = digits.replace(/^0+(?=\d)/, '');
+    e.target.value = digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    
+    if (e.target._x_model) e.target._x_model.set(e.target.value);
+};
