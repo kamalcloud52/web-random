@@ -274,7 +274,7 @@
                 <div>
                     <div class="w-10 h-10 rounded-xl bg-emerald-50 text-brand-700 flex items-center justify-center mb-3"><i class="fa-solid fa-shield-halved"></i></div>
                     <h3 class="text-base font-bold text-slate-800">Login Admin</h3>
-                    <p class="text-xs text-slate-500 mt-1" x-text="connection.mode === 'apps-script' ? 'Akses admin diverifikasi melalui akun Google.' : 'Masuk untuk menambahkan transaksi kas.'"></p>
+                    <p class="text-xs text-slate-500 mt-1" x-text="connection.mode === 'apps-script' ? 'Akses admin diverifikasi melalui akun Google.' : (connection.mode === 'cloudflare' ? 'Masukkan kata sandi admin untuk mengelola kas.' : 'Masuk untuk menambahkan transaksi kas.')"></p>
                 </div>
                 <button @click="modals.login = false" aria-label="Tutup login" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
@@ -283,12 +283,12 @@
                     <label for="adminUsername" class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
                     <input id="adminUsername" type="text" x-model="admin.username" autocomplete="username" placeholder="Username admin" :required="connection.mode === 'demo'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
-                <div x-show="connection.mode === 'demo'">
+                <div x-show="connection.mode !== 'apps-script'">
                     <label for="adminPassword" class="block text-xs font-semibold text-slate-600 mb-1">Kata sandi</label>
-                    <input id="adminPassword" type="password" x-model="admin.password" autocomplete="current-password" placeholder="Kata sandi admin" :required="connection.mode === 'demo'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
+                    <input id="adminPassword" type="password" x-model="admin.password" autocomplete="current-password" placeholder="Kata sandi admin" :required="connection.mode !== 'apps-script'" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:border-brand-600 text-sm">
                 </div>
                 <p x-show="connection.mode === 'demo'" class="text-[10px] text-slate-400">Login simulasi untuk pratinjau; data belum tersimpan di Spreadsheet.</p>
-                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 shadow-md transition-colors" x-text="connection.mode === 'apps-script' ? 'Verifikasi akun Google' : 'Masuk dan lanjutkan'"></button>
+                <button type="submit" class="w-full py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 shadow-md transition-colors" x-text="connection.mode === 'apps-script' ? 'Verifikasi akun Google' : (connection.mode === 'cloudflare' ? 'Masuk sebagai admin' : 'Masuk dan lanjutkan')"></button>
             </form>
         </div>
     </div>
